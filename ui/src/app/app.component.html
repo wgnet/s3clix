@@ -1,0 +1,40 @@
+<div class="body mat-app-background h-100">
+  <midi-page-layout>
+    <midi-navbar navbar>
+      <midi-navbar-section>
+        <midi-menu-item midiAppSwitcher [appsURL]="environment.serviceDiscoveryUrl">
+          <mat-icon icon>apps</mat-icon>
+          <span>Other services</span>
+        </midi-menu-item>
+        <midi-menu-item #item matTooltip="Home" [matTooltipDisabled]="item.isOpened" matTooltipPosition="after"
+                        routerLinkActive="active"
+                        [routerLinkActiveOptions]="{exact:true}"
+                        [routerLink]="['/home']">
+          <mat-icon icon>home</mat-icon>
+          <span>Home</span>
+        </midi-menu-item>
+      </midi-navbar-section>
+
+      <midi-navbar-section>
+        <midi-menu-item #openTrigger>
+          <div icon class="sidebar-close-icon" [class.close]="openTrigger.isOpened">
+            <div class="bar"></div>
+          </div>
+          Close menu
+        </midi-menu-item>
+      </midi-navbar-section>
+    </midi-navbar>
+    <midi-page-header header>
+      <div class="header d-flex justify-content-between align-items-center w-100">
+        <div class="d-none d-md-inline-block breadcrumbs-container">
+          <app-breadcrumbs></app-breadcrumbs>
+        </div>
+        <div class="quick-actions-container fs-5">
+
+
+        </div>
+      </div>
+    </midi-page-header>
+    <router-outlet></router-outlet>
+  </midi-page-layout>
+</div>

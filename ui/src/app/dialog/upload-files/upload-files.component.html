@@ -1,0 +1,29 @@
+<div mat-dialog-title class="mb-3">
+  File Upload
+</div>
+<div mat-dialog-content>
+  <div class="input-group mb-2">
+    <input type="file" (change)="handleFileInput($event)" class="form-control" id="inputGroupFile"
+           aria-describedby="inputGroupFileAddon" aria-label="Upload" multiple>
+  </div>
+  <div class="d-flex flex-column w-100">
+    <div *ngFor="let file of filesToUpload" class="mb-1">
+      <div *ngIf="uploadStatus[file.name]?.uploading"><small>{{ file.name }}
+        uploading... {{uploadStatus[file.name].progress}}%</small></div>
+      <div *ngIf="uploadStatus[file.name]?.success"><small>{{ file.name }} uploaded successfully &#10003;</small>
+      </div>
+      <div *ngIf="uploadStatus[file.name]?.failed"><small>{{ file.name }} upload failed 😢</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div mat-dialog-actions [align]="'end'" class="mb-2 d-flex flex-column w-100">
+  <div class="w-100 d-flex justify-content-end">
+    <button mat-raised-button color="primary" class='me-2' [disabled]="disableUploadButton"
+            (click)="uploadFiles()">Upload
+    </button>
+    <button mat-raised-button (click)="onCancel()">Cancel</button>
+  </div>
+</div>
+

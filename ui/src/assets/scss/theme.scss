@@ -1,0 +1,188 @@
+@use '@angular/material' as mat;
+@use 'sass:color';
+@use 'sass:map';
+
+@include mat.core();
+
+$success-palette: (
+  50 : #f2f8ef,
+  100 : #dfedd8,
+  200 : #c9e2be,
+  300 : #b3d6a4,
+  400 : #a3cd91,
+  500 : #93c47d,
+  600 : #8bbe75,
+  700 : #80b66a,
+  800 : #76af60,
+  900 : #64a24d,
+  A100 : #ffffff,
+  A200 : #daffcd,
+  A400 : #b4ff9a,
+  A700 : #a1ff80,
+  contrast: (
+    50 : #000000,
+    100 : #000000,
+    200 : #000000,
+    300 : #000000,
+    400 : #000000,
+    500 : #000000,
+    600 : #000000,
+    700 : #000000,
+    800 : #000000,
+    900 : #000000,
+    A100 : #000000,
+    A200 : #000000,
+    A400 : #000000,
+    A700 : #000000,
+  )
+);
+
+$primary: mat.define-palette(mat.$teal-palette);
+$accent: mat.define-palette(mat.$yellow-palette);
+$warn: mat.define-palette(mat.$red-palette);
+
+$typography: mat.define-typography-config(
+  $font-family: 'Titillium Web, PT Sans, Roboto',
+  $button: mat.define-typography-level(inherit, inherit, 400, null, normal)
+);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$theme: mat.define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn,
+  ),
+  density: 0,
+  typography: $typography
+));
+
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($theme);
+@include mat.all-component-typographies($typography);
+
+/* You can add global styles to this file, and also import other style files */
+
+.mat-form-inline {
+  @include mat.private-form-field-density(-4.5);
+
+  .mat-mdc-form-field {
+    width: 100%
+  }
+
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+  }
+}
+
+@mixin background-color($theme) {
+  $color-config: mat.get-color-config($theme);
+
+  $primary-palette: map.get($color-config, 'primary');
+
+  .active-item {
+    background-color: mat.get-color-from-palette($primary-palette, 100) !important;
+    color: mat.get-color-from-palette($primary-palette, '100-contrast');
+  }
+}
+
+@function colorFromPalette($theme, $palette, $hue) {
+  $color-config: mat.get-color-config($theme);
+  $primary-palette: map.get($color-config, $palette);
+
+  @return mat.get-color-from-palette($primary-palette, $hue);
+}
+
+@include background-color($theme);
+
+@debug adjust-color(#284e69, $alpha: -0.5);
+@debug color.adjust(#284e69, $alpha: 0.95);
+
+:root {
+  --cap-card-header-height: 57px;
+  --navbar-color: #{mat.get-color-from-palette($primary, '500-contrast')};
+  --navbar-background: #{color.adjust(mat.get-color-from-palette($primary, 500), $alpha: -0.05)};
+  --menu-item-hover-background: #{mat.get-color-from-palette($primary, 400)};
+  --menu-item-active-background: #{mat.get-color-from-palette($primary, 600)};
+}
+
+
+.snackbar-success .mat-mdc-snack-bar-action {
+  color: mat.get-color-from-palette($success-palette, 500) !important;
+}
+
+.snackbar-error .mat-mdc-snack-bar-action {
+  color: colorFromPalette($theme, 'warn', 500) !important;
+}
+
+.midi-dialog {
+  min-width: 50%;
+  max-width: 50%;
+
+  &.warning {
+    .mat-mdc-dialog-title {
+      color: darkblue;
+      background-color: #FAD961;
+    }
+  }
+
+  &.success {
+    .mat-mdc-dialog-title {
+      color: white;
+      background-color: mat.get-color-from-palette($success-palette, 500);
+    }
+  }
+
+  &.danger {
+    .mat-mdc-dialog-title {
+      color: white;
+      background-color: colorFromPalette($theme, 'warn', 500);
+    }
+  }
+
+  .mat-mdc-dialog-title {
+    margin: 0;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid lightgray;
+    color: var(--navbar-color) !important;
+    background-color: var(--navbar-background);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  .mat-mdc-dialog-container {
+    padding: 0;
+  }
+
+  .mat-mdc-dialog-content {
+    margin: 0;
+    padding: 1rem;
+  }
+
+  .mat-mdc-dialog-actions {
+    padding: 0.5rem 1rem;
+    margin: 0;
+  }
+
+}
+.mat-form-inline {
+
+  @include mat.private-form-field-density(-5);
+
+}
+
+.mat-mdc-option {
+  min-height: 30px!important;
+}
+

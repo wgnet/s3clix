@@ -1,0 +1,9 @@
+<div mat-dialog-title class="mb-3 d-flex justify-content-center">
+  Are you sure?
+</div>
+<div mat-dialog-content>{{ dialogText }}</div>
+<div mat-dialog-actions class="d-flex justify-content-center mb-1">
+  <button mat-raised-button color="{{ dialogType === 'warn' ? 'warn' : 'primary' }}" class='me-2' (click)="onConfirm()">Confirm</button>
+  <button mat-raised-button (click)="onCancel()">Cancel</button>
+</div>
+

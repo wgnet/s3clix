@@ -1,0 +1,205 @@
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.calendar-wrapper {
+  perspective-origin: center;
+  perspective: 1000px;
+
+
+  .calendar-stand {
+    position: relative;
+    transform: rotate3d(-0.2, -0.2, 1, -10deg);
+    //transform: rotate3d(1, 0, 0, -89deg);
+    width: 15rem;
+    aspect-ratio: 1;
+    padding: 0 0.5em 0 0.5em;
+    background-color: #5A6261;
+    border-bottom: 3px solid #34312E;
+    border-left: 1px solid #34312E;
+    perspective: 1000px;
+    perspective-origin: center;
+
+
+    .calendar {
+      position: relative;
+      transform: translateY(-10px);
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: stretch;
+      perspective-origin: 0;
+      perspective: 1000px;
+
+      &:after {
+        content: '';
+        bottom: -5px;
+        left: 0;
+        position: absolute;
+        transform: rotateX(110deg);
+        width: 100%;
+        height: 10px;
+        background-color: white;
+        box-shadow: 1px -10px 25px 2px rgba(146, 145, 137, 0.75) inset;
+      }
+
+      .month {
+        @include flex-center;
+
+        border-left: 3px solid #ffd2d1;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+        box-shadow: 1px 20px 11px -15px rgba(0, 0, 0, 0.75);
+        flex-grow: 1;
+        width: 100%;
+        background-color: #E9574F;
+        color: white;
+        font-size: 5em;
+      }
+
+      .day {
+        @include flex-center;
+
+        border-left: 3px solid #e6e6e6;
+        flex-grow: 2;
+        width: 100%;
+        background-color: white;
+        color: #565656;
+        font-size: 7em;
+      }
+
+
+    }
+  }
+
+  .stand-shadow {
+    transform: rotateX(82deg) rotateY(356deg) rotateZ(332deg);
+    width: 15rem;
+    height: 15rem;
+    background-color: #77777780;
+    box-shadow: 0 0 39px #777;
+    position: absolute;
+    bottom: -38%;
+    left: -14%;
+    border-radius: 1rem;
+  }
+}
+
+
+.display-container {
+  background-color: black;
+  padding: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 0.5rem;
+
+  .display {
+    display: inline-block;
+    position: relative;
+    width: 5rem;
+    aspect-ratio: 0.5;
+    background-color: black;
+
+    .segment {
+      position: absolute;
+      background-color: #262626;
+
+
+      &:nth-of-type(2), &:nth-of-type(4), &:nth-of-type(6) {
+        width: 68%;
+        height: 0.8rem;
+        clip-path: polygon(0 50%, 13% 0, 90% 0, 100% 50%, 87% 100%, 10% 100%);
+      }
+
+      &:nth-of-type(1), &:nth-of-type(3), &:nth-of-type(5), &:nth-of-type(7) {
+        width: 0.8rem;
+        height: 45%;
+        transform: rotate(5deg);
+        clip-path: polygon(50% 0, 100% 10%, 100% 90%, 50% 100%, 0% 90%, 0% 10%);
+      }
+
+      &:nth-of-type(1) {
+        top: 5%;
+        left: 9%;
+      }
+
+      &:nth-of-type(2) {
+        top: 0.5%;
+        left: 23%;
+      }
+
+      &:nth-of-type(3) {
+        top: 5%;
+        right: 3%;
+      }
+
+      &:nth-of-type(4) {
+        top: 47%;
+        left: 15%;
+      }
+
+      &:nth-of-type(5) {
+        top: 51%;
+        right: 10%;
+      }
+
+      &:nth-of-type(6) {
+        top: 93%;
+        left: 8%;
+      }
+
+      &:nth-of-type(7) {
+        top: 51%;
+        left: 1%;
+      }
+
+      &.active {
+        background-color: #00ff00;
+      }
+    }
+  }
+
+  .dots-display {
+    background-color: black;
+    display: inline-block;
+    height: 5rem;
+    position: relative;
+    width: 1rem;
+
+    .dot {
+      position: absolute;
+      font-size: 6rem;
+      background-color: #00ff00;
+      width: 0.7rem;
+      height: 0.7rem;
+      border-radius: 50%;
+      animation: blink 500ms infinite both;
+
+      &:nth-of-type(1) {
+        top: 25%;
+        left: 10%;
+      }
+
+      &:nth-of-type(2) {
+        left: 0;
+        top: 65%;
+      }
+    }
+  }
+}
+
+@keyframes blink {
+  from {
+    opacity: 0
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+

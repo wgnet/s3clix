@@ -1,0 +1,14 @@
+<ol class="d-flex w-100 custom-list align-items-center m-0 p-0">
+  <li class="text-body-secondary d-flex align-items-center">
+    <mat-icon (click)="handleSelectedPage(0)" role="button">home</mat-icon>
+  </li>
+  <li *ngFor="let item of urlSegments; let last = last; let i = index" class="">
+    <span *ngIf="i>0">
+    <span class="me-2 ms-2">/</span>
+    <span (click)="handleSelectedPage(i)" *ngIf="!last" role='button' class="text-body-secondary">{{item}}
+    </span>
+    <span *ngIf="last">{{item}}</span>
+      </span>
+  </li>
+
+</ol>

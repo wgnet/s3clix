@@ -1,0 +1,29 @@
+[package]
+name = "s3clix"
+version = "0.1.0"
+edition = "2021"
+authors = ["Wargaming.Net"]
+documentation = "README.md"
+
+
+[dependencies]
+anyhow = "1.0.71"
+axum = { version = "0.6.18", features = ["headers", "multipart", "query", "original-uri"] }
+axum-server = { version = "0.5.1", features = ["tls-rustls"] }
+axum-extra = { version = "0.7.4", features = ["async-read-body", "cookie", ] }
+clap = { version = "4.3.0", features = ["derive"] }
+env_logger = "0.10.0"
+log = { version = "0.4.18", features = ["serde", "std"] }
+rust-s3 = { version = "0", features = ["no-verify-ssl"] }
+serde = { version = "1.0.163", features = ["derive", "serde_derive", "rc"] }
+tokio = { version = "1.28.2", features = ["full"] }
+tokio-util = { version = "0.7.8", features = ["compat"] }
+futures-util = "0.3.28"
+tower-http = { version = "0.4.0", features = ["fs", "cors"] }
+reqwest = { version = "0.11.18", features = ["stream", "tokio-rustls", "json"] }
+mime_guess = "2.0.4"
+serde_json = "1.0.96"
+base64 = "0.21.2"
+jwt-simple = "0.11.5"
+serde_yaml = "0.9.33"
+aho-corasick = "1.1.3"

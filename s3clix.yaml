@@ -1,0 +1,19 @@
+threads: 10
+web:
+  path: web
+  port: 8080
+
+auth: None
+
+s3:
+  upload_type: Parallel
+  workers: 4
+  upload_memory_pool: 400000000
+  download_memory_pool: 400000000
+  buckets:
+    - bucket: default
+      alias: main
+      style: Subdomain
+      access_key: "******"
+      secret_key: "******"
+      url: https://s3.eu-central-1.amazonaws.com

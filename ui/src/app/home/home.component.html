@@ -1,0 +1,53 @@
+<div [class.loaded]="!(dataService.loading$ | async)" id="loader-wrapper">
+  <div id="loader"></div>
+  <div class="loader-section section-left"></div>
+  <div class="loader-section section-right"></div>
+</div>
+<div class="p-3 main-section">
+  <div class="position-absolute align-items-center w-100 btn__action">
+    <button mat-icon-button class="custom-btn me-2" (click)="goBack()" [disabled]="!hasHistory()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="position-absolute buckets__content" [class.hidden]="bucketsList().length==1">
+      <div class="mat-form-inline w-75">
+        <mat-form-field appearance="outline">
+          <mat-label>Choose a bucket</mat-label>
+          <mat-select [value]="activeBucket()" (selectionChange)="selectBucket($event)">
+            <mat-option *ngFor="let item of bucketsList()" [value]="item.name">{{ item.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="position-absolute top-0 search-button">
+      <app-search-field></app-search-field>
+    </div>
+    <div class="position-absolute top-0 custom-btn__action__position">
+      <button mat-button color="primary" class='custom-btn__action' (click)="onCreateFolderButton()">
+        <mat-icon>create_new_folder</mat-icon>
+        <span class="d-none d-xxl-inline-block text-nowrap fs-6">Create folder</span>
+      </button>
+      <button mat-button class='custom-btn__action' (click)="onUploadFileButton()">
+        <mat-icon>note_add</mat-icon>
+        <span class="d-none d-xxl-inline-block text-nowrap fs-6">Upload file</span>
+      </button>
+    </div>
+  </div>
+  <app-view (sortType)="setSortType($event)">
+    <app-item [data]="item" midiGlassHover *ngFor="let item of displayed(); let i =index"
+              [disableFileDelete]="!canUserDeleteFiles()"
+              (invokeFileAction)="handleMenuButtonClick($event)"
+              (click)="handleSelectedElement(item)">
+    </app-item>
+    <div *ngIf="!(dataService.loading$ | async) && !displayed().length " class="ms-3 mt-3 text-secondary">Current folder
+      is empty
+    </div>
+  </app-view>
+  <mat-paginator [length]="folderListSignal().length"
+                 [pageSize]="100"
+                 [pageIndex]="currentPageIndex()"
+                 [pageSizeOptions]="[10, 25, 100]"
+                 (page)="pageHandler($event)"
+                 class="mat-paginator-sticky"
+                 aria-label="Select page">
+  </mat-paginator>
+</div>

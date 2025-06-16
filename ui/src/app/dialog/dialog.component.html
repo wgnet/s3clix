@@ -1,0 +1,35 @@
+<div class="w-100 h-100 d-flex justify-content-center align-items-center dialog-container">
+  <div [ngSwitch]="true" class="w-75 h-75 z-1">
+    <app-video *ngSwitchCase="['mp4', 'ogg', 'webm'].includes(ext)"
+               src="/api/download/{{selectedItem.path | encodeURI}}"></app-video>
+    <ngx-extended-pdf-viewer *ngSwitchCase="ext=='pdf'" src="/api/download/{{selectedItem.path | encodeURI}}" [height]="'100%'"
+                             [textLayer]="true" [showHandToolButton]="true"></ngx-extended-pdf-viewer>
+    <app-image *ngSwitchCase="['png', 'jpeg'].includes(ext)"
+               src="/api/download/{{selectedItem.path | encodeURI}}"></app-image>
+    <app-unsupported-format *ngSwitchDefault [fileName]="selectedItem.name"></app-unsupported-format>
+  </div>
+  <button [hidden]="!(previousItemIndex) && previousItemIndex != 0"
+          class="carousel-control-prev control__custom control__lPosition z-1"
+          type="button"
+          (click)="handleItemSwitching(previousItemIndex!)">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button [hidden]="!(nextItemIndex) && nextItemIndex !=0"
+          class="carousel-control-next control__custom control__rPosition z-1"
+          type="button"
+          (click)="handleItemSwitching(nextItemIndex!)">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+
+  <div class="position-absolute bottom-0 w-100 bg-black pt-2 pb-2 ps-2 pe-2 z-1">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="text-white">{{selectedItem.name}}</div>
+      <a class="btn btn-primary btn-sm btn_custom" href="/api/download/{{selectedItem.path | encodeURI}}" role="button">Download</a>
+    </div>
+  </div>
+</div>
+<div class="position-absolute w-100 h-100 z-0 top-0" (click)="dialogRef.close()"></div>
+
+

@@ -1,0 +1,44 @@
+<div class="h-100">
+  <div class="d-flex justify-content-end mb-3 btn__action">
+    <button (click)='setPresentationStyle(presentationStyle.list)' class="btn_custom me-1"
+            [class.btn_active]="currentPresentationStyle == presentationStyle.list">
+      <i class="bi bi-list-ul"></i>
+    </button>
+    <button (click)='setPresentationStyle(presentationStyle.grid)' class="btn_custom"
+            [class.btn_active]="currentPresentationStyle == presentationStyle.grid">
+      <i class="bi bi-grid"></i>
+    </button>
+  </div>
+
+  <div class="view-section">
+
+    <div [hidden]='!currentPresentationStyle' class="text-body-secondary row text-center table-header">
+      <div (click)="setSortType('name')" class="col-6 border-bottom pt-3 pb-3" role="button">
+        Name
+        <i class="bi position-absolute"
+           [class.bi-arrow-up]="currentSortType().field =='name' && !currentSortType().reverse"
+           [class.bi-arrow-down]="currentSortType().field =='name' && currentSortType().reverse" role="button"></i>
+      </div>
+      <div (click)="setSortType('size')" class="col-3 border-bottom pt-3 pb-3 " role="button">
+        Size
+        <i class="bi position-absolute"
+           [class.bi-arrow-up]="currentSortType().field =='size' && !currentSortType().reverse"
+           [class.bi-arrow-down]="currentSortType().field =='size' && currentSortType().reverse" role="button"></i>
+      </div>
+      <div class="col-2 border-bottom pt-3 pb-3" role="button">
+        Kind
+        <i class="bi position-absolute"
+           [class.bi-arrow-up]="currentSortType().field =='kind' && !currentSortType().reverse"
+           [class.bi-arrow-down]="currentSortType().field =='kind' && currentSortType().reverse" role="button"></i>
+      </div>
+      <div class="col-1 border-bottom"></div>
+    </div>
+    <div [class.d-flex]="!currentPresentationStyle"
+         [class.flex-wrap]="!currentPresentationStyle">
+      <ng-content></ng-content>
+    </div>
+
+  </div>
+
+</div>
+
