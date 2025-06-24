@@ -1,1 +1,4 @@
-<div class="h-100 d-flex justify-content-center align-items-center"><img [src]="src" alt="image"/></div>
+<app-loader [isLoading]="isLoading()"></app-loader>
+<div class="h-100 d-flex justify-content-center align-items-center">
+    <img [src]="src" (load)="onLoad()" alt="image" class="img_size"/>
+</div>

@@ -1,31 +1,35 @@
 <div mat-dialog-title class="mb-3">
-  Create folder
+    Create folder
 </div>
 <div mat-dialog-content class="w-100">
-  <div class="mat-form-inline pt-1">
-    <mat-form-field appearance="outline" class="w-100">
-      <mat-label>Folder Name
-      </mat-label>
-      <input matInput [formControl]="folderNameFC">
+    <div class="mat-form-inline pt-1">
+        <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Folder Name
+            </mat-label>
+            <input matInput [formControl]="folderNameFC">
 
-      <mat-error *ngIf="folderNameFC.hasError('required')">
-        This field is <strong>required</strong>.
-      </mat-error>
-      <mat-error *ngIf="folderNameFC.hasError('pattern')">
-        Invalid characters. <strong>[/]</strong> not allowed.
-      </mat-error>
-      <mat-error *ngIf="folderNameFC.hasError('emptyValue')">
-        This field must contain more than just spaces.
-      </mat-error>
-    </mat-form-field>
-  </div>
+            @if (folderNameFC.hasError('required')) {
+                <mat-error>
+                    This field is <strong>required</strong>.
+                </mat-error>
+            }
+            @if (folderNameFC.hasError('pattern')) {
+                <mat-error>
+                    Invalid characters. <strong>[/]</strong> not allowed.
+                </mat-error>
+            }
+            @if (folderNameFC.hasError('emptyValue')) {
+                <mat-error>
+                    This field must contain more than just spaces.
+                </mat-error>
+            }
+        </mat-form-field>
+    </div>
 </div>
-<div mat-dialog-actions [align]="'end'" class="mb-2 d-flex flex-column w-100">
-  <div class="d-flex justify-content-end w-100">
-    <button mat-raised-button color="primary" class='me-2' [disabled]="folderNameFC.invalid" (click)="createFolder()">
-      Create
+<div mat-dialog-actions [align]="'end'" class="mb-2 d-flex w-100">
+    <button mat-flat-button class='me-2' [disabled]="folderNameFC.invalid" (click)="createFolder()">
+        Create
     </button>
     <button mat-raised-button (click)="dialogRef.close(false)">Cancel</button>
-  </div>
 </div>
 

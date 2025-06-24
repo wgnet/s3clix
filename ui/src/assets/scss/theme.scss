@@ -1,188 +1,167 @@
 @use '@angular/material' as mat;
-@use 'sass:color';
-@use 'sass:map';
+@use "fonts";
+@use "./_theme-colors" as colors;
 
-@include mat.core();
-
-$success-palette: (
-  50 : #f2f8ef,
-  100 : #dfedd8,
-  200 : #c9e2be,
-  300 : #b3d6a4,
-  400 : #a3cd91,
-  500 : #93c47d,
-  600 : #8bbe75,
-  700 : #80b66a,
-  800 : #76af60,
-  900 : #64a24d,
-  A100 : #ffffff,
-  A200 : #daffcd,
-  A400 : #b4ff9a,
-  A700 : #a1ff80,
-  contrast: (
-    50 : #000000,
-    100 : #000000,
-    200 : #000000,
-    300 : #000000,
-    400 : #000000,
-    500 : #000000,
-    600 : #000000,
-    700 : #000000,
-    800 : #000000,
-    900 : #000000,
-    A100 : #000000,
-    A200 : #000000,
-    A400 : #000000,
-    A700 : #000000,
-  )
-);
-
-$primary: mat.define-palette(mat.$teal-palette);
-$accent: mat.define-palette(mat.$yellow-palette);
-$warn: mat.define-palette(mat.$red-palette);
-
-$typography: mat.define-typography-config(
-  $font-family: 'Titillium Web, PT Sans, Roboto',
-  $button: mat.define-typography-level(inherit, inherit, 400, null, normal)
-);
-
-// Create the theme object. A theme consists of configurations for individual
-// theming systems such as "color" or "typography".
-$theme: mat.define-light-theme((
-  color: (
-    primary: $primary,
-    accent: $accent,
-    warn: $warn,
-  ),
-  density: 0,
-  typography: $typography
-));
-
-
-// Include theme styles for core and each component used in your app.
-// Alternatively, you can import and @include the theme mixins for each component
-// that you are using.
-@include mat.all-component-themes($theme);
-@include mat.all-component-typographies($typography);
-
-/* You can add global styles to this file, and also import other style files */
-
-.mat-form-inline {
-  @include mat.private-form-field-density(-4.5);
-
-  .mat-mdc-form-field {
-    width: 100%
-  }
-
-  .mat-mdc-icon-button.mat-mdc-button-base {
-    width: 40px;
-    height: 40px;
-    padding: 8px;
-  }
-}
-
-@mixin background-color($theme) {
-  $color-config: mat.get-color-config($theme);
-
-  $primary-palette: map.get($color-config, 'primary');
-
-  .active-item {
-    background-color: mat.get-color-from-palette($primary-palette, 100) !important;
-    color: mat.get-color-from-palette($primary-palette, '100-contrast');
-  }
-}
-
-@function colorFromPalette($theme, $palette, $hue) {
-  $color-config: mat.get-color-config($theme);
-  $primary-palette: map.get($color-config, $palette);
-
-  @return mat.get-color-from-palette($primary-palette, $hue);
-}
-
-@include background-color($theme);
-
-@debug adjust-color(#284e69, $alpha: -0.5);
-@debug color.adjust(#284e69, $alpha: 0.95);
+$elevated-container-shape: 4px;
+$filled-container-shape: 4px;
+$outlined-container-shape: 4px;
+$protected-container-shape: 4px;
+$text-container-shape: 4px;
 
 :root {
-  --cap-card-header-height: 57px;
-  --navbar-color: #{mat.get-color-from-palette($primary, '500-contrast')};
-  --navbar-background: #{color.adjust(mat.get-color-from-palette($primary, 500), $alpha: -0.05)};
-  --menu-item-hover-background: #{mat.get-color-from-palette($primary, 400)};
-  --menu-item-active-background: #{mat.get-color-from-palette($primary, 600)};
+    --custom-container-background-color: color-mix(in srgb, var(--mat-sys-surface-bright) 97%, rgb(255 255 255 / 20%));
+    --custom-primary-background: color-mix(in srgb, var(--mat-sys-primary-container), transparent 20%);
+    --custom-border-radius: var(--mdc-filled-button-container-shape, var(--mat-sys-corner-full));
+    --primary-light: color-mix(in srgb, var(--mat-sys-primary-container) 95%, white);
+    --primary-light-light: color-mix(in srgb, var(--mat-sys-primary-container) 90%, white);
+    --primary-dark: color-mix(in srgb, var(--mat-sys-primary-container) 95%, black);
+    --primary-dark-dark: color-mix(in srgb, var(--mat-sys-primary-container) 90%, black);
+    --custom-menu-item-hover-background: light-dark(var(--primary-dark), var(--primary-light));
+    --custom-menu-item-active-background: light-dark(var(--primary-dark-dark), var(--primary-light-light));
+
+
+    @include mat.paginator-overrides((
+        container-background-color: var(--mat-sys-surface-container-lowest),
+    ));
+
+    @include mat.menu-overrides((
+        container-color: var(--custom-container-background-color)
+    ));
+
+    @include mat.dialog-overrides((
+        container-shape: $filled-container-shape,
+    ));
+
+
+    @include mat.snack-bar-overrides((
+        container-color: var(--mat-sys-surface-container-low),
+        supporting-text-color: var(--mat-sys-on-surface),
+    ));
+
+    @include mat.select-overrides((
+        panel-background-color: var(--custom-container-background-color),
+    ));
+
+
+    @include mat.button-toggle-overrides((
+        height: 2rem,
+        shape:6px
+    ));
+
+
 }
 
 
-.snackbar-success .mat-mdc-snack-bar-action {
-  color: mat.get-color-from-palette($success-palette, 500) !important;
-}
+html {
+    color-scheme: light dark;
+    font-family: 'Titillium Web', 'PT Sans', Roboto, sans-serif;
 
-.snackbar-error .mat-mdc-snack-bar-action {
-  color: colorFromPalette($theme, 'warn', 500) !important;
-}
+    @include mat.theme((
+        color: (
+            primary: colors.$primary-palette,
+            tertiary: colors.$tertiary-palette,
+        ),
+        typography: ('Titillium Web', 'PT Sans', Roboto),
+        density: 0
+    ));
 
-.midi-dialog {
-  min-width: 50%;
-  max-width: 50%;
+    @include mat.button-overrides((
+        filled-container-shape: $filled-container-shape,
+        outlined-container-shape: $outlined-container-shape,
+        protected-container-shape: $protected-container-shape,
+        text-container-shape: $text-container-shape,
+        outlined-container-height: 2.25rem,
+        filled-container-height: 2.25rem,
+        protected-container-height: 2.25rem,
+        text-container-height: 2.25rem,
+        outlined-horizontal-padding: 1rem,
+        outlined-icon-offset: 0,
+        outlined-outline-color: var(--mat-sys-outline-variant),
+        filled-horizontal-padding: 1rem,
+        filled-icon-offset: 0,
+        protected-horizontal-padding: 1rem,
+        protected-icon-offset: 0,
+        text-horizontal-padding: 1rem,
+        text-icon-offset: 0,
+    ));
 
-  &.warning {
-    .mat-mdc-dialog-title {
-      color: darkblue;
-      background-color: #FAD961;
+    @include mat.form-field-density(-5);
+
+    @include mat.card-overrides((
+        elevated-container-shape: $elevated-container-shape,
+        outlined-container-shape: $outlined-container-shape
+    ));
+
+    a {
+        color: var(--mat-sys-primary);
     }
-  }
 
-  &.success {
-    .mat-mdc-dialog-title {
-      color: white;
-      background-color: mat.get-color-from-palette($success-palette, 500);
+    .viewer-dialog {
+        @include mat.dialog-overrides((
+            container-color: rgba(0, 0, 0, 0.8)
+        ));
     }
-  }
 
-  &.danger {
-    .mat-mdc-dialog-title {
-      color: white;
-      background-color: colorFromPalette($theme, 'warn', 500);
+    .action-dialog {
+        @include mat.dialog-overrides((
+            container-color: var(--custom-container-background-color)
+        ));
     }
-  }
-
-  .mat-mdc-dialog-title {
-    margin: 0;
-    padding: 0.5rem 1rem;
-    border-bottom: 1px solid lightgray;
-    color: var(--navbar-color) !important;
-    background-color: var(--navbar-background);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    font-size: 25px;
-    font-weight: 600;
-    font-style: normal;
-  }
-
-  .mat-mdc-dialog-container {
-    padding: 0;
-  }
-
-  .mat-mdc-dialog-content {
-    margin: 0;
-    padding: 1rem;
-  }
-
-  .mat-mdc-dialog-actions {
-    padding: 0.5rem 1rem;
-    margin: 0;
-  }
-
 }
+
+h1 {
+    line-height: var(--mat-sys-headline-small-line-height) !important;
+    font: var(--mat-sys-headline-small) !important;
+}
+
+h2 {
+    line-height: var(--mat-sys-headline-small-line-height) !important;
+    font: var(--mat-sys-headline-small) !important;
+}
+
+h3 {
+    line-height: var(--mat-sys-title-medium-line-height) !important;
+    font: var(--mat-sys-title-medium) !important;
+}
+
+h4 {
+    line-height: var(--mat-sys-title-medium-line-height) !important;
+    font: var(--mat-sys-title-medium) !important;
+}
+
+body {
+    background: var(--mat-sys-surface) !important; // Important is required to override bs background
+    color: var(--mat-sys-on-surface) !important; // Important is required to override bs color
+    font: var(--mat-sys-body-medium);
+
+    &.dark-mode {
+        color-scheme: dark;
+    }
+}
+
 .mat-form-inline {
-
-  @include mat.private-form-field-density(-5);
-
+    mat-form-field {
+        width: 100%;
+    }
 }
 
-.mat-mdc-option {
-  min-height: 30px!important;
+.warn-button {
+    @include mat.button-overrides((
+        filled-container-color: var(--mat-sys-error)
+    ));
 }
+
+.regular-button {
+    @include mat.button-overrides((
+        text-label-text-color: var(--mat-sys-on-surface)
+    ));
+}
+
+.view-button__active {
+    @include mat.button-overrides((
+        text-label-text-color: var(--mat-sys-on-secondary)
+    ));
+}
+
+
 

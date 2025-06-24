@@ -1,0 +1,43 @@
+<div class="menu-container panels-container slide-in-left d-flex flex-column">
+    <app-menu-search-results class="flex-grow-0" #searchPanel></app-menu-search-results>
+    @if (!(searchPanel.searching | async)) {
+        <div class="d-flex flex-row flex-grow-1 overflow-hidden menu-container__body p-3">
+            <div class="category-list px-3">
+                @for (category of appsCatalog.category; track category) {
+                    <div class="category-container">
+                        <h3 class="m-0 category-container__header" [attr.title]="category.name">{{ category.name }}</h3>
+                        @for (service of category.service_catalog; track service) {
+                            <div glassHover role="button" class="px-3 py-2" (mouseenter)="selectService(service)">
+                                @if (service.service.length === 1) {
+                                    <h4 class="m-0">
+                                        <a class="category-container__link"
+                                           [href]="service.service[0].url">{{ service.name }}</a>
+                                    </h4>
+                                } @else {
+                                    <h4 class="m-0 category-container__text">{{ service.name }}</h4>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            @if (selectedService(); as service) {
+                <div class="instance-container px-3 d-flex flex-column">
+                    <div class="instance-container__header">
+                        <h1>{{ service.name }}</h1>
+                    </div>
+                    <div class="instance-container__links">
+                        @for (serviceItem of service.service; track serviceItem) {
+                            <div>
+                                <a [href]="serviceItem.url">{{ serviceItem.name }}</a>
+                            </div>
+                        }
+                    </div>
+                    <div class="instance-container__description">
+                        <span>{{ service.description }}</span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

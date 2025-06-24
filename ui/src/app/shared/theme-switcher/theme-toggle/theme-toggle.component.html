@@ -1,0 +1,12 @@
+<mat-button-toggle-group [hideSingleSelectionIndicator]="true"
+                         [(value)]="themeService.mode">
+    <mat-button-toggle matTooltip="Dark" matTooltipPosition="below" [value]="UiModes.DARK">
+        <mat-icon>dark_mode</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle matTooltip="System" matTooltipPosition="below" [value]="UiModes.SYSTEM">
+        <mat-icon>contrast</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle matTooltip="Light" matTooltipPosition="below" [value]="UiModes.LIGHT">
+        <mat-icon>light_mode</mat-icon>
+    </mat-button-toggle>
+</mat-button-toggle-group>

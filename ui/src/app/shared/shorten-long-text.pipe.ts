@@ -12,22 +12,24 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
-  name: 'shortenLongText'
+    name: 'shortenLongText',
+    standalone: false
 })
 export class ShortenLongTextPipe implements PipeTransform {
 
-  transform(value: string): unknown {
-    const maxLength = 30;
+    transform(value: string): unknown {
+        const maxLength = 30;
 
-    if (value.length <= maxLength) {
-      return value;
+        if (value.length <= maxLength) {
+            return value;
+        }
+
+        return value.substring(0, 20) + '...' + value.substring(value.length - 5);
     }
-
-    return value.substring(0, 20) + '...' + value.substring(value.length - 5);
-  }
 
 }

@@ -1,0 +1,39 @@
+@use 'src/styles.scss' as mixin;
+
+$margin: 0.5rem;
+
+
+:host {
+    @include mixin.not-so-liquid-glass;
+
+    flex: 0 0 62px;
+    transition: flex 200ms cubic-bezier(0.33, -0.29, 0.63, 1.37);
+    height: calc(100% - 2 * #{$margin});
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    background: var(--custom-primary-background);
+    color: var(--mat-sys-on-primary-container);
+    overflow: hidden;
+    margin: $margin;
+    border-radius: var(--custom-border-radius);
+    animation: navbar-appear 0.3s forwards linear;
+    position: relative;
+}
+
+@keyframes navbar-appear {
+    from {
+        border-radius: 0;
+        background: transparent;
+    }
+    to {
+        border-radius: var(--custom-border-radius);
+        background: var(--custom-primary-background);
+    }
+}
+
+
+:host(.opened) {
+    flex: 0 0 220px;
+}

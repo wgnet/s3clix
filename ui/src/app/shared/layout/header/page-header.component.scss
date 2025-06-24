@@ -1,0 +1,9 @@
+:host {
+    flex: 0 0 50px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+}

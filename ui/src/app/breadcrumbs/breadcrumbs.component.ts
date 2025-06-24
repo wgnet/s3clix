@@ -12,33 +12,36 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 import {Component, OnInit} from '@angular/core';
 import {NavigationEnd, Router} from "@angular/router";
 import {filter} from "rxjs";
 
 @Component({
-  selector: 'app-breadcrumbs',
-  templateUrl: './breadcrumbs.component.html',
-  styleUrls: ['./breadcrumbs.component.scss']
+    selector: 'app-breadcrumbs',
+    templateUrl: './breadcrumbs.component.html',
+    styleUrls: ['./breadcrumbs.component.scss'],
+    standalone: false
 })
 export class BreadcrumbsComponent implements OnInit {
-  urlSegments: string[] = []
+    urlSegments: string[] = [];
 
-  constructor(private router: Router) {}
+    constructor(private router: Router) {
+    }
 
-  ngOnInit() {
-    this.router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd)
-      )
-      .subscribe(event => {
-        this.urlSegments = decodeURIComponent((event as NavigationEnd).url).split(/(\?file=|\?bucket=)/)[0].split('/').filter(element => !!element);
-      });
-  }
+    ngOnInit() {
+        this.router.events
+            .pipe(
+                filter(event => event instanceof NavigationEnd)
+            )
+            .subscribe(event => {
+                this.urlSegments = decodeURIComponent((event as NavigationEnd).url).split(/(\?file=|\?bucket=)/)[0].split('/').filter(element => !!element);
+            });
+    }
 
-  handleSelectedPage(i: number) {
-    const path = this.urlSegments.slice(0, i + 1);
-    this.router.navigate([''].concat(path));
-  }
+    handleSelectedPage(i: number) {
+        const path = this.urlSegments.slice(0, i + 1);
+        this.router.navigate([''].concat(path));
+    }
 }

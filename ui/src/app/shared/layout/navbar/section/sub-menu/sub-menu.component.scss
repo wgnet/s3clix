@@ -1,0 +1,11 @@
+.sub-menu-container {
+
+    ::ng-deep a[mat-menu-item] {
+        color: var(--mat-sys-on-primary-container);
+
+        mat-icon {
+            color: var(--mat-sys-on-primary-container);
+        }
+    }
+}
+

@@ -12,22 +12,24 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 import {Component} from '@angular/core';
 import {Router} from "@angular/router";
 
 @Component({
-  selector: 'k8s-not-found-page',
-  templateUrl: './not-found-page.component.html',
-  styleUrls: ['./not-found-page.component.scss']
+    selector: 'k8s-not-found-page',
+    templateUrl: './not-found-page.component.html',
+    styleUrls: ['./not-found-page.component.scss'],
+    standalone: false
 })
 export class NotFoundPageComponent {
 
-  constructor(private router: Router) {
-  }
+    constructor(private router: Router) {
+    }
 
 
-  goHome() {
-    this.router.navigate(['/']);
-  }
+    goHome() {
+        this.router.navigate(['/']);
+    }
 }

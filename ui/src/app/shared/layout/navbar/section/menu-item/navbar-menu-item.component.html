@@ -1,0 +1,33 @@
+<div class="item" (click)="onClick()">
+    <div class="icon">
+        <ng-content select="[icon]"></ng-content>
+    </div>
+    <div class="text">
+        <ng-content></ng-content>
+    </div>
+    @if (!!subMenuTemplate && isOpened) {
+        <mat-icon class="float-end me-2">
+            {{ (expanded) ? 'expand_less' : 'expand_more' }}
+        </mat-icon>
+    }
+</div>
+<div #expandable class="expandable-container" [class.expanded]="expanded">
+    <div class="expandable-content" [class.expanded]="expanded">
+        @if (isOpened) {
+            <div>
+                <ng-container *ngTemplateOutlet="submenuContent"></ng-container>
+            </div>
+        }
+    </div>
+</div>
+<ng-template #popupContent>
+    <div class="sub-menu-popup">
+        <ng-container *ngTemplateOutlet="submenuContent"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #submenuContent>
+    <ng-content select="sub-menu"></ng-content>
+</ng-template>
+
+

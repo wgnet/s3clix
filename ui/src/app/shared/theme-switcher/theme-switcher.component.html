@@ -1,0 +1,15 @@
+@if (navbarOpened()) {
+    <div class="slow-reveal-toggle">
+        <theme-toggle></theme-toggle>
+    </div>
+} @else {
+    <mat-icon class="cursor-pointer theme-icon"
+              [class.moon-to-sun]="currentTheme() === UITheme.LIGHT"
+              [class.system-to-moon]="currentTheme() === UITheme.SYSTEM"
+              [matTooltip]="(currentTheme() | titlecase) + ' theme'"
+              (click)="switchTheme()">{{ icon() }}
+    </mat-icon>
+}
+
+
+

@@ -12,18 +12,25 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
-import {Component, Input} from '@angular/core';
+**/
+
+import {Component, Input, signal} from '@angular/core';
 
 @Component({
-  selector: 'app-image',
-  templateUrl: './image.component.html',
-  styleUrls: ['./image.component.scss']
+    selector: 'app-image',
+    templateUrl: './image.component.html',
+    styleUrls: ['./image.component.scss'],
+    standalone: false
 })
 export class ImageComponent {
 
-  @Input('src')
-  src!: string;
+    @Input('src')
+    src!: string;
 
+    isLoading = signal<boolean>(true);
+
+    onLoad() {
+        this.isLoading.set(false);
+    }
 
 }

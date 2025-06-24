@@ -12,25 +12,27 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
-  name: 'bytesToSize',
-  pure: true
+    name: 'bytesToSize',
+    pure: true,
+    standalone: false
 })
 export class BytesToSizePipe implements PipeTransform {
 
-  transform(bytes: number): string {
-    if (bytes === 0) return '0';
+    transform(bytes: number): string {
+        if (bytes === 0) return '0';
 
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
 
 
 }

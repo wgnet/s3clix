@@ -12,10 +12,10 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
-import {Component, computed, effect, OnInit, signal} from '@angular/core';
-import {DataServiceService} from '../../services/data-service.service'
-import {IFile, ISortType} from '../models/files.model'
+**/
+
+import {Component, computed, effect, inject, signal} from '@angular/core';
+import {IFile, ISortType, PresentationStyle} from '../models/files.model';
 import {ActivatedRoute, Router} from "@angular/router";
 import {PageEvent} from "@angular/material/paginator";
 import {MatDialog} from "@angular/material/dialog";
@@ -23,415 +23,389 @@ import {DialogComponent} from "../dialog/dialog.component";
 import {comparator} from '../shared/utility/utility';
 import {CreateFolderComponent} from "../dialog/create-folder/create-folder.component";
 import {UploadFilesComponent} from "../dialog/upload-files/upload-files.component";
-import {ConfirmationDialodData, ConfirmDialogComponent, DialogType} from "../dialog/confirm-dialog/confirm-dialog.component";
-import {NotificationAction, NotificationService, NotificationType} from "../../services/notification.service";
-import {MatSnackBar} from "@angular/material/snack-bar";
+import {
+    ConfirmationDialodData,
+    ConfirmDialogComponent,
+    DialogType
+} from "../dialog/confirm-dialog/confirm-dialog.component";
+import {NotificationAction, NotificationService, NotificationType} from "../services/notification.service";
 import {ComponentType} from "@angular/cdk/overlay";
 import {FileAction, IFileListQueryParams} from "../models/common.model";
 import {HttpErrorResponse} from "@angular/common/http";
-import {toSignal} from "@angular/core/rxjs-interop";
+import {rxResource, toSignal} from "@angular/core/rxjs-interop";
 import {Clipboard} from "@angular/cdk/clipboard";
 import {getCookie} from '../shared/utility/cookie';
+import {DataServiceService} from "../services/data-service.service";
+import {catchError, finalize, firstValueFrom, forkJoin, map, of} from "rxjs";
 
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss'],
+    standalone: false
 })
 
-export class HomeComponent implements OnInit {
-  currentPath: string = '*';
+export class HomeComponent {
+    protected readonly PresentationStyle = PresentationStyle;
 
-  folderListSignal = signal<IFile[]>([]);
-  currentPageIndex = signal(0);
-  currentPageSize = signal(100);
-  currentSortType = signal<ISortType>({field: '', reverse: false});
-  bucketsList = signal<{ name: string, label: string }[]>([]);
-  activeBucket = signal<string>('');
-  canUserUploadFiles = signal(false);
-  canUserDeleteFiles = signal(false);
-  hasHistory = signal(false);
+    private readonly dataService = inject(DataServiceService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly dialog = inject(MatDialog);
+    private readonly notificationService = inject(NotificationService);
+    private readonly clipboard = inject(Clipboard);
 
-  sortedList = computed(() => {
-    const sortType = this.currentSortType();
-    const sortedList = this.folderListSignal().sort((a, b) => {
-      return comparator((a as any)[sortType.field], (b as any)[sortType.field])
-    })
-    return (sortType.reverse) ? sortedList.reverse() : sortedList
 
-  })
+    readonly urlSegments = toSignal(this.route.url);
+    readonly queryParams = toSignal(this.route.queryParams);
 
-  displayed = computed(() => {
-    const pageIndex = this.currentPageIndex();
-    const pageSize = this.currentPageSize()
-    const offset = pageIndex * pageSize;
-    const limit = offset + pageSize;
-    return this.sortedList().slice(offset, limit);
-  })
+    readonly currentPath = computed(() => {
+        const segments = this.urlSegments();
+        return segments?.filter(seg => seg.path).map(seg => seg.path).join('/') ?? '';
+    });
 
-  urlSegments = toSignal(this.route.url);
+    readonly currentPageIndex = signal(0);
+    readonly currentPageSize = signal(100);
+    readonly currentSortType = signal<ISortType>({field: '', reverse: false});
+    readonly currentPresentationStyle = signal<PresentationStyle>(PresentationStyle.list);
 
-  queryParams = toSignal(this.route.queryParams);
+    readonly selectedBucket = signal<string>('');
+    readonly activeFile = signal<string>('');
 
-  isLoadingFilesByBucket = signal(this.queryParams()?.['bucket'] && this.queryParams()?.['bucket'] != getCookie("bucket.name", null));
+    readonly bucketsResource = rxResource({
+        loader: () => this.dataService.getBuckets().pipe(map((data) => {
+            return data.map((value) => {
+                return {label: value, name: value};
+            });
+        }), catchError(() => {
+            this.notificationService.showNotification(`Something went wrong, while loading buckets...😢`, NotificationType.ERROR, NotificationAction.RELOAD_PAGE);
+            return of([]);
+        })),
+        defaultValue: []
+    });
 
-  constructor(public dataService: DataServiceService,
-              private route: ActivatedRoute,
-              private router: Router,
-              private dialog: MatDialog,
-              private notificationService: NotificationService,
-              private snackBar: MatSnackBar,
-              private clipboard: Clipboard) {
-    effect(() => {
-      if (this.isLoadingFilesByBucket()) {
-        return;
-      }
+    readonly bucketsList = computed(() => this.bucketsResource.value());
 
-      this.parsingQueryParams();
-    }, {allowSignalWrites: true});
-  }
+    readonly filesUpdaterTrigger = signal(0);
 
-  parsingQueryParams() {
-    const queryParams = this.queryParams();
-    const urlSegments = this.urlSegments();
-    this.hasHistory.set(!!urlSegments?.length);
-
-    if (urlSegments) {
-      const assumedPath = this.getAssumedPath();
-      if (this.currentPath !== assumedPath) {
-        this.currentPath = assumedPath;
-        this.loadFiles();
-        this.currentPageIndex.set(0);
-      }
-    }
-
-    const folderList = this.folderListSignal();
-    if (queryParams && folderList.length !== 0) {
-      this.openFile(queryParams['file']);
-    }
-  }
-
-  getAssumedPath() {
-    const urlSegments = this.urlSegments();
-    if (urlSegments) {
-      return urlSegments.filter(segment => !!segment.path).map(segment => segment.path).join('/');
-    }
-
-    return '';
-  }
-
-  openFile(fileName: string) {
-    const index = this.folderListSignal().findIndex(file => file.name === fileName);
-    if (index !== -1) {
-      this.openViewDialog(index);
-    } else if (fileName) {
-      this.notificationService.showNotification(`There is no file: ${fileName}`)
-      this.router.navigate([], {
-        queryParams: {
-          'file': null,
+    readonly filesResource = rxResource<IFile[], [string, number] | undefined>({
+        request: () => {
+            if (!this.selectBucketResource.hasValue()) return undefined;
+            return [this.currentPath(), this.filesUpdaterTrigger()];
         },
-        queryParamsHandling: 'merge'
-      })
-    }
-  }
-
-  checkUserPermissions() {
-    this.canUserDeleteFiles.set(false); // by default
-    this.canUserUploadFiles.set(false); // by default
-
-    this.dataService.canUserDeleteFiles().subscribe(value => {
-      this.canUserDeleteFiles.set(value);
-    });
-
-    this.dataService.canUserUploadFiles().subscribe(value => {
-      this.canUserUploadFiles.set(value);
-    });
-  }
-
-  ngOnInit() {
-    this.loadBuckets();
-    const queryParams = this.queryParams();
-    if (queryParams?.['bucket']) {
-      this.activeBucket.set(queryParams['bucket']);
-      this.isLoadingFilesByBucket.set(true);
-      this.dataService.selectBucket(queryParams['bucket']).subscribe({
-        next: () => {
-          this.checkUserPermissions();
-          this.currentPath = this.getAssumedPath();
-          this.loadFiles();
+        loader: ({request}) => {
+            if (!request) return of([]);
+            const [path] = request;
+            return this.dataService.getFiles(path).pipe(
+                catchError(() => {
+                    this.notificationService.showNotification(`Something went wrong, while loading files...😢`, NotificationType.ERROR, NotificationAction.RELOAD_PAGE);
+                    return of([]);
+                })
+            );
         },
-        error: () => {
-          this.router.navigate(['/home'])
-          this.notificationService.showNotification(`Something went wrong, while loading files...😢`, NotificationType.ERROR, NotificationAction.RELOAD_PAGE);
-        },
-        complete: () => {
-          this.isLoadingFilesByBucket.set(false);
-        },
-      });
-    } else {
-      this.checkUserPermissions();
-    }
-
-    this.notificationService.getStream().subscribe(notification => {
-      const actionMessage = (notification.action === NotificationAction.DISMISS) ? 'Dismiss' : 'Reload page';
-      const duration = (notification.action === NotificationAction.DISMISS) ? 3000 : 6000;
-
-      const snackBarRef = this.snackBar.open(notification.message, actionMessage, {
-        duration: duration,
-        verticalPosition: 'top',
-        horizontalPosition: 'end'
-      });
-
-      snackBarRef.afterDismissed().subscribe(() => {
-        if (notification.action === NotificationAction.RELOAD_PAGE)
-          window.location.reload();
-      })
+        defaultValue: []
     });
-  }
 
-  private loadFiles() {
-    this.folderListSignal.set([])
-    this.dataService.getFiles(this.currentPath).subscribe({
-      next: (items: IFile[]) => {
-        this.folderListSignal.set(items);
-      }, 
-      error: () => {
-        this.notificationService.showNotification(`Something went wrong, while loading files...😢`, NotificationType.ERROR, NotificationAction.RELOAD_PAGE);
-      }
-    })
-  }
-
-  private loadBuckets() {
-    this.dataService.getBuckets().subscribe({
-      next: (data) => {
-        const bucketsList = data.map((value) => {
-          return { label: value, name: value };
-        });
-        this.bucketsList.set(bucketsList);
-        this.activeBucket.set(getCookie('bucket.name', data.at(0)));
-      },
-      error: (e) => {
-        this.notificationService.showNotification(`Something went wrong, while loading buckets...😢`, NotificationType.ERROR, NotificationAction.RELOAD_PAGE);
-      },
+    readonly selectBucketResource = rxResource({
+        request: () => this.selectedBucket(),
+        loader: ({request}) =>
+            request ?
+                this.dataService.selectBucket(request).pipe(
+                    catchError(() => {
+                        this.notificationService.showNotification(`Something went wrong, while selecting bucket...😢`, NotificationType.ERROR, NotificationAction.RELOAD_PAGE);
+                        return of();
+                    })
+                )
+                : of(void 0)
     });
-  }
 
-  goBack() {
-    if (this.currentPath) {
-      const newPath: string[] = this.currentPath.split('/').slice(0, -1);
-      if (newPath) {
-        this.router.navigate(['/home'].concat(newPath));
-      } else {
-        this.router.navigate(['/home'])
-      }
-    }
-  }
-
-  pageHandler(event: PageEvent) {
-    this.currentPageSize.set(event.pageSize);
-    this.currentPageIndex.set(event.pageIndex);
-  }
-
-  handleSelectedElement(item: IFile) {
-    if (item.folder) {
-      const pathParts = item.path.split('/').filter(element => !!element);
-      this.router.navigate(['/home'].concat(pathParts), {
-        queryParams: {
-          bucket: this.activeBucket(),
-        }
-      });
-      this.currentPageIndex.set(0);
-    } else {
-      const params: IFileListQueryParams = {
-        file: item.name,
-        bucket: this.activeBucket(),
-      };
-      this.router.navigate(['./'], {
-        queryParams: params,
-        relativeTo: this.route
-      });
-    }
-  }
-
-  handleMenuButtonClick(event: { item: IFile, action: FileAction }) {
-    switch (event.action) {
-      case FileAction.delete:
-        this.deleteFile(event.item)
-        break;
-
-      case FileAction.download:
-        this.downloadFile(event.item)
-        break;
-
-      case FileAction.copyLink:
-        this.copyLinkToClipboard(event.item)
-        break;
-
-      case FileAction.copyCdnLink:
-        this.copyCdnLinkToClipboard(event.item)
-        break;
-
-      case FileAction.deleteFolder:
-        this.deleteFolder(event.item)
-        break;
-    }
-  }
-
-  openViewDialog(index: number) {
-    this.dialog.open(DialogComponent, {
-      panelClass: "custom-dialog-container",
-      maxWidth: '100vw',
-      maxHeight: '100vh',
-      data: {elements: this.displayed(), index: index}
-    }).afterClosed().subscribe(() => {
-        this.router.navigate(['./'], {
-          relativeTo: this.route,
-          queryParams: { bucket: this.activeBucket() },
-        });
-      }
-    );
-  }
-
-  setSortType(sortType: any) {
-    if (sortType) {
-      this.currentSortType.set(sortType);
-    }
-  }
-
-  onCreateFolderButton() {
-    if (!this.canUserUploadFiles()) {
-      this.notificationService.showNotification("Sorry, but you don't have the permission to create folder");
-      return;
-    }
-    return this.openActionDialog(CreateFolderComponent)
-  }
-
-  onUploadFileButton() {
-    if (!this.canUserUploadFiles()) {
-      this.notificationService.showNotification("Sorry, but you don't have the permission to upload files");
-      return;
-    }
-    return this.openActionDialog(UploadFilesComponent)
-  }
-
-  openActionDialog(component: ComponentType<any>) {
-    const dialogRef = this.dialog.open(component, {
-      panelClass: 'midi-dialog',
-      position: {top: '10vh'},
-      minWidth: '20vw',
-      maxWidth: '50vw',
-      data: this.currentPath
-    })
-    dialogRef.afterClosed().subscribe((result) => {
-      result ? this.loadFiles() : ''
-      ;
+    readonly permissionsResource = rxResource({
+        request: () => this.selectBucketResource.value(),
+        loader: () => forkJoin({
+            deletePerm: this.dataService.canUserDeleteFiles(),
+            uploadPerm: this.dataService.canUserUploadFiles()
+        }).pipe(
+            catchError(() => {
+                this.notificationService.showNotification(`Something went wrong, while loading permissions...😢`, NotificationType.ERROR, NotificationAction.RELOAD_PAGE);
+                return of({deletePerm: false, uploadPerm: false});
+            })
+        ),
+        defaultValue: {deletePerm: false, uploadPerm: false}
     });
-  }
 
-  showConfirmationDialog(data?: ConfirmationDialodData) {
-    return this.dialog.open(ConfirmDialogComponent, {
-      panelClass: 'midi-dialog',
-      position: {top: '10.5vh'},
-      maxWidth: '370px',
-      minWidth: '370px',
-      height: '200px',
-      data,
+    readonly canUserDeleteFiles = computed(() => this.permissionsResource.value().deletePerm);
+    readonly canUserUploadFiles = computed(() => this.permissionsResource.value().uploadPerm);
+
+    readonly isLoading = computed(() => this.filesResource.isLoading());
+
+    readonly folderList = computed(() => this.filesResource.value() ?? []);
+
+    readonly sortedFolders = computed(() => {
+        const sortType = this.currentSortType();
+        const sorted = [...this.folderList()].sort((a, b) => comparator((a as any)[sortType.field], (b as any)[sortType.field]));
+        return sortType.reverse ? sorted.reverse() : sorted;
     });
-  }
 
-  deleteFile(file: IFile) {
-    if (!this.canUserDeleteFiles()) {
-      return;
-    }
+    readonly displayedFolders = computed(() => {
+        const offset = this.currentPageIndex() * this.currentPageSize();
+        return this.sortedFolders().slice(offset, offset + this.currentPageSize());
+    });
 
-    this.showConfirmationDialog().afterClosed().subscribe((result: boolean) => {
-        if (result) {
-          const filePath = file.path
-          this.dataService.deleteFile(filePath).subscribe({
-            next: () => {
-              this.notificationService.showNotification(`File ${file.name} was successfully deleted!`);
-            },
-            error: (err: HttpErrorResponse) => {
-              this.notificationService.showNotification(`File ${file.name} can not be deleted, due to: ${err.message}`);
-            },
-            complete: () => {
-              this.loadFiles()
+
+    readonly hasHistory = computed(() => !!this.urlSegments()?.length);
+
+
+    constructor() {
+        effect(() => {
+            if (this.bucketsResource.value().length && !this.selectedBucket()) {
+                this.selectedBucket.set(getCookie('bucket.name', this.bucketsResource.value().at(0)?.name));
             }
-          })
-        }
-      }
-    )
-  }
 
-  downloadFile(file: IFile) {
-    const encodedFilePath = encodeURIComponent(file.path)
-    window.open(`/api/download/${encodedFilePath}`, '_blank')
-  }
+        });
 
-  copyLinkToClipboard(file: IFile) {
-    const currentUrl = this.router.url.split('?file=')[0];
-    const queryParams = `&file=${encodeURIComponent(file.name)}`;
-    const fullUrl = `${window.location.origin}/#${currentUrl}${queryParams}`;
-    this.clipboard.copy(fullUrl)
-    this.notificationService.showNotification('Share link has been copied into clipboard');
-  }
-
-  copyCdnLinkToClipboard(file: IFile) {
-    if (file.cdn_url) {
-      this.clipboard.copy(file.cdn_url);
-      this.notificationService.showNotification('CDN link has been copied into clipboard');
-    } else {
-      this.notificationService.showNotification('Oooops. There is nothing to copy');
-    }
-  }
-
-  selectBucket(event: any) {
-    if (event.value === this.activeBucket()) {
-      return;
-    }
-    this.activeBucket.set(event.value);
-    this.isLoadingFilesByBucket.set(true);
-    this.router.navigate(['/home']);
-    this.dataService.selectBucket(event.value).subscribe({
-      next: () => {
-        this.checkUserPermissions();
-        this.currentPath = '';
-        this.loadFiles();
-      },
-      error: () => {
-        this.notificationService.showNotification(`Bucket selection error... 😢`, NotificationType.ERROR, NotificationAction.RELOAD_PAGE);
-      },
-      complete: () => {
-        this.isLoadingFilesByBucket.set(false);
-      },
-    });
-  }
-
-  deleteFolder(folder: IFile) {
-    if (!this.canUserDeleteFiles()) {
-      return;
-    }
-
-    this.showConfirmationDialog({ 
-      dialogText: 'This action will result in the complete deletion of all contents in this folder.',
-      dialogType: DialogType.WARNING,
-    }).afterClosed().subscribe((result: boolean) => {
-        if (result) {
-          const folderPath = folder.path;
-          this.dataService.deleteFolder(folderPath).subscribe({
-            next: () => {
-              this.notificationService.showNotification(`The folder ${folder.name} was successfully deleted!`);
-            },
-            error: (err: HttpErrorResponse) => {
-              this.notificationService.showNotification(`The folder ${folder.name} can not be deleted, due to: ${err.message}`);
-            },
-            complete: () => {
-              this.loadFiles()
+        effect(() => {
+            const bucket = this.queryParams()?.['bucket'];
+            if (bucket && bucket !== this.selectedBucket()) {
+                this.selectedBucket.set(bucket);
             }
-          })
+        });
+
+        effect(() => {
+            if (this.urlSegments()) {
+                this.currentPageIndex.set(0);
+            }
+        });
+
+        effect(() => {
+            const queryParams = this.queryParams();
+            const folderList = this.folderList();
+            if (queryParams && queryParams['file'] && folderList.length !== 0 && this.activeFile() != queryParams['file']) {
+                this.activeFile.set(queryParams['file']);
+                this.openFile(queryParams['file']);
+            }
+        });
+    }
+
+    openFile(fileName: string) {
+        const index = this.folderList().findIndex(file => file.name === fileName);
+        if (index !== -1) {
+            this.openViewDialog(index);
+        } else if (fileName) {
+            this.notificationService.showNotification(`There is no file: ${fileName}`);
+            this.router.navigate([], {
+                queryParams: {
+                    'file': null
+                },
+                queryParamsHandling: 'merge'
+            });
         }
-      }
-    )
-  }
+    }
+
+    async openViewDialog(index: number) {
+        const dialogRef = this.dialog.open(DialogComponent, {
+            panelClass: 'viewer-dialog',
+            minWidth: '100vw',
+            maxWidth: '100vw',
+            height: '100vh',
+            data: {elements: this.folderList(), index: index}
+        });
+        await firstValueFrom(dialogRef.afterClosed());
+
+        this.activeFile.set('');
+        await this.router.navigate(['./'], {
+            relativeTo: this.route,
+            queryParams: {bucket: this.selectedBucket()}
+        });
+    }
+
+    goBack() {
+        if (this.currentPath()) {
+            const newPath: string[] = this.currentPath().split('/').slice(0, -1);
+            if (newPath) {
+                this.router.navigate(['/home'].concat(newPath));
+            } else {
+                this.router.navigate(['/home']);
+            }
+        }
+    }
+
+    pageHandler(event: PageEvent) {
+        this.currentPageSize.set(event.pageSize);
+        this.currentPageIndex.set(event.pageIndex);
+    }
+
+    setSortType(sortType: any) {
+        if (sortType) {
+            this.currentSortType.set(sortType);
+        }
+    }
+
+    selectBucket(bucket: string) {
+        this.selectedBucket.set(bucket);
+        this.router.navigate(['/home']);
+    }
+
+    setPresentationStyle(value: PresentationStyle) {
+        this.currentPresentationStyle.set(value);
+    }
+
+    handleSelectedElement(item: IFile) {
+        if (item.folder) {
+            const pathParts = item.path.split('/').filter(element => !!element);
+            this.router.navigate(['/home'].concat(pathParts), {
+                queryParams: {
+                    bucket: this.selectedBucket()
+                }
+            });
+        } else {
+            const params: IFileListQueryParams = {
+                file: item.name,
+                bucket: this.selectedBucket()
+            };
+            this.router.navigate(['./'], {
+                queryParams: params,
+                relativeTo: this.route
+            });
+        }
+    }
+
+    handleMenuButtonClick(event: { item: IFile, action: FileAction }) {
+        switch (event.action) {
+            case FileAction.delete:
+                this.deleteFile(event.item);
+                break;
+
+            case FileAction.download:
+                this.downloadFile(event.item);
+                break;
+
+            case FileAction.copyLink:
+                this.copyLinkToClipboard(event.item);
+                break;
+
+            case FileAction.copyCdnLink:
+                this.copyCdnLinkToClipboard(event.item);
+                break;
+
+            case FileAction.deleteFolder:
+                this.deleteFolder(event.item);
+                break;
+        }
+    }
+
+    onCreateFolderButton() {
+        if (!this.canUserUploadFiles()) {
+            this.notificationService.showNotification("Sorry, but you don't have the permission to create folder");
+            return;
+        }
+        return this.openActionDialog(CreateFolderComponent);
+    }
+
+    onUploadFileButton() {
+        if (!this.canUserUploadFiles()) {
+            this.notificationService.showNotification("Sorry, but you don't have the permission to upload files");
+            return;
+        }
+        return this.openActionDialog(UploadFilesComponent);
+    }
+
+    async openActionDialog(component: ComponentType<any>) {
+        const dialogRef = this.dialog.open(component, {
+            panelClass: 'action-dialog',
+            position: {top: '10vh'},
+            minWidth: '20vw',
+            maxWidth: '50vw',
+            data: this.currentPath()
+        });
+
+        const result = await firstValueFrom(dialogRef.afterClosed());
+
+        if (result) {
+            this.filesUpdaterTrigger.update(v => v + 1);
+        }
+    }
+
+    downloadFile(file: IFile) {
+        const encodedFilePath = encodeURIComponent(file.path);
+        window.open(`/api/download/${encodedFilePath}`, '_blank');
+    }
+
+    copyLinkToClipboard(file: IFile) {
+        const currentUrl = this.router.url.split('?file=')[0];
+        const queryParams = `&file=${encodeURIComponent(file.name)}`;
+        const fullUrl = `${window.location.origin}/#${currentUrl}${queryParams}`;
+        this.clipboard.copy(fullUrl);
+        this.notificationService.showNotification('Share link has been copied into clipboard');
+    }
+
+    copyCdnLinkToClipboard(file: IFile) {
+        if (file.cdn_url) {
+            this.clipboard.copy(file.cdn_url);
+            this.notificationService.showNotification('CDN link has been copied into clipboard');
+        } else {
+            this.notificationService.showNotification('Oooops. There is nothing to copy');
+        }
+    }
+
+    async deleteFolder(folder: IFile) {
+        if (!this.canUserDeleteFiles()) {
+            return;
+        }
+
+        const confirmed = await this.showConfirmationDialog({
+            dialogText: 'This action will result in the complete deletion of all contents in this folder.',
+            dialogType: DialogType.WARNING
+        });
+
+        if (!confirmed) return;
+
+        this.dataService.deleteFolder(folder.path).pipe(
+            finalize(() => this.filesUpdaterTrigger.update(v => v + 1)))
+            .subscribe({
+                next: () => {
+                    this.notificationService.showNotification(`The folder ${folder.name} was successfully deleted!`);
+                },
+                error: (err: HttpErrorResponse) => {
+                    this.notificationService.showNotification(`The folder ${folder.name} can not be deleted, due to: ${err.message}`);
+                }
+            });
+    }
+
+    async deleteFile(file: IFile) {
+        if (!this.canUserDeleteFiles()) {
+            return;
+        }
+
+        const confirmed = await this.showConfirmationDialog({
+            dialogText: 'This file will be permanently deleted.',
+            dialogType: DialogType.WARNING
+        });
+
+        if (!confirmed) return;
+
+        this.dataService.deleteFile(file.path).pipe(
+            finalize(() => this.filesUpdaterTrigger.update(v => v + 1)))
+            .subscribe({
+                next: () => {
+                    this.notificationService.showNotification(`File ${file.name} was successfully deleted!`);
+                },
+                error: (err: HttpErrorResponse) => {
+                    this.notificationService.showNotification(`File ${file.name} can not be deleted, due to: ${err.message}`);
+                }
+            });
+    }
+
+    async showConfirmationDialog(data?: ConfirmationDialodData) {
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            panelClass: 'action-dialog',
+            position: {top: '10.5vh'},
+            maxWidth: '370px',
+            minWidth: '370px',
+            height: '200px',
+            data
+        });
+
+        return firstValueFrom(dialogRef.afterClosed());
+    }
 }

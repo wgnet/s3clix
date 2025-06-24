@@ -1,45 +1,6 @@
-.table-header {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background-color: #fafafa;
-}
-
-.btn_custom {
-  background-color: inherit;
-  border: none;
-  padding: 1px 3px;
-}
-
-.btn_active {
-  font-weight: bolder;
-  font-size: larger;
-  border: 1px solid lightgrey;
-  border-radius: 15%;
-  box-shadow: 1px 1px 4px lightgrey;
-  background-color: rgba(0, 150, 136, 0.85);
-  color: white;
-}
-
-.btn__action {
-  position: absolute;
-  top: 67px;
-  right: 10px;
-  z-index: 2;
-
-}
-
-@media only screen and (max-width: 370px) {
-  .btn__action {
-    visibility: hidden;
-  }
-}
-
-.view-section {
-  height: 95%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  margin-top: 3rem;
+.header__bg-color {
+    color: color-mix(in srgb, var(--mat-sys-on-surface), transparent 30%);;
+    background: var(--mat-sys-surface);
 }
 
 

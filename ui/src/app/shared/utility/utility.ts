@@ -12,15 +12,16 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 export function comparator(a: any, b: any) {
-  if (typeof a == typeof b) {
-    if (typeof a === 'string') {
-      return b.localeCompare(a)
+    if (typeof a == typeof b) {
+        if (typeof a === 'string') {
+            return b.localeCompare(a);
+        }
+        if (typeof a === 'number') {
+            return a - b;
+        }
     }
-    if (typeof a === 'number') {
-      return a - b
-    }
-  }
-  return 0;
+    return 0;
 }

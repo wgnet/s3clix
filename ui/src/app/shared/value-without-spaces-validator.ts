@@ -12,17 +12,18 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 import {AbstractControl, ValidationErrors, ValidatorFn} from "@angular/forms";
 
 export function valueWithoutSpacesValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value: string = control.value;
+    return (control: AbstractControl): ValidationErrors | null => {
+        const value: string = control.value;
 
-    if (value && !value.trim().length) {
-      return {emptyValue: true};
-    }
+        if (value && !value.trim().length) {
+            return {emptyValue: true};
+        }
 
-    return null;
-  }
+        return null;
+    };
 }

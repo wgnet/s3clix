@@ -12,7 +12,8 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {HomeRoutingModule} from './home-routing.module';
@@ -30,38 +31,50 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {EncodeURIPipe} from "../shared/encode-uri.pipe";
 import {SearchFieldComponent} from "../shared/search-field/search-field.component";
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatSelectModule} from '@angular/material/select';
+import {TextViewerComponent} from "../dialog/viewers/text-viewer/text-viewer.component";
+import {CodemirrorModule} from "@ctrl/ngx-codemirror";
+import '../dialog/viewers/text-viewer/codeMirror-config';
+import {LoaderComponent} from "../shared/loader/loader.component";
+import {PdfViewerComponent} from "../dialog/viewers/pdf-viewer/pdf-viewer.component";
+import {GlassHoverDirective} from "../shared/glass-hover.directive";
 
 
 @NgModule({
-  declarations: [
-    HomeComponent,
-    DialogComponent,
-    VideoComponent,
-    ImageComponent,
-    UnsupportedFormatComponent,
-    EncodeURIPipe,
-    SearchFieldComponent,
-  ],
-  imports: [
-    CommonModule,
-    HomeRoutingModule,
-    ItemsViewModule,
-    MatPaginatorModule,
-    MatButtonModule,
-    MatDialogModule,
-    NgxExtendedPdfViewerModule,
-    MatIconModule,
-    MatSnackBarModule,
-    ReactiveFormsModule,
-    MatSelectModule,
-  ],
-  exports: [],
-  providers: [
-    MatDialog,
-    {provide: MatDialogRef, useValue: {}}
-  ]
+    declarations: [
+        HomeComponent,
+        DialogComponent,
+        VideoComponent,
+        ImageComponent,
+        UnsupportedFormatComponent,
+        EncodeURIPipe,
+        SearchFieldComponent,
+        TextViewerComponent,
+        PdfViewerComponent
+    ],
+    imports: [
+        CommonModule,
+        HomeRoutingModule,
+        ItemsViewModule,
+        MatPaginatorModule,
+        MatButtonModule,
+        MatDialogModule,
+        NgxExtendedPdfViewerModule,
+        MatIconModule,
+        MatSnackBarModule,
+        ReactiveFormsModule,
+        MatSelectModule,
+        CodemirrorModule,
+        FormsModule,
+        LoaderComponent,
+        GlassHoverDirective
+    ],
+    exports: [],
+    providers: [
+        MatDialog,
+        {provide: MatDialogRef, useValue: {}}
+    ]
 })
 export class HomeModule {
 }

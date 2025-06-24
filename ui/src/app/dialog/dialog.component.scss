@@ -1,25 +1,20 @@
-.dialog-container {
-  width: 100vw !important;
-  height: 100vh !important;
-}
 
 .control__custom {
-  width: 5%;
+    width: 5%;
+    height: 70px;
+    top: 47%;
 }
 
 .control__lPosition {
-  left: 5%
+    left: 5%
 }
 
 .control__rPosition {
-  right: 5%
+    right: 5%
 }
 
 .btn_custom {
-  background-color: rgba(0, 150, 136, 0.95);
-  border-color: rgba(0, 150, 136);
+    background-color: var(--mat-sys-primary);
+    border-color: var(--mat-sys-secondary);
 }
 
-.btn_custom:focus {
-  box-shadow: 0 0 0 0.25rem rgba(0, 150, 136)
-}

@@ -1,0 +1,90 @@
+@use 'src/styles.scss' as mixin;
+
+:host {
+    border-radius: var(--custom-border-radius);
+    display: flex;
+    margin: 0.5rem;
+    flex-direction: column;
+    align-items: stretch;
+    box-shadow: var(--mat-sys-level-1);
+
+    &:hover, &.sub-menu-expanded {
+        background: var(--custom-menu-item-hover-background);
+    }
+
+    &.sub-menu-expanded {
+        box-shadow: var(--mat-sys-level1);
+    }
+
+    .item {
+        flex-grow: 1;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        .icon {
+            flex: 1 0 45px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+
+        .text {
+            flex: 10 10 0;
+            opacity: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: opacity 200ms ease-in-out;
+        }
+    }
+}
+
+:host(.opened) {
+    .item {
+
+        .text {
+            opacity: 1;
+        }
+    }
+}
+
+:host(.active) {
+    background-color: var(--custom-menu-item-active-background);
+}
+
+.sub-menu-popup {
+    @include mixin.not-so-liquid-glass;
+
+    margin-left: 1rem;
+    background-color: var(--custom-primary-background);
+    color: var(---mat-sys-on-primary-container);
+    border-radius: var(--custom-border-radius);
+    animation: appear-from-nowhere 0.5s linear;
+
+    a {
+        color: var(--mat-sys-on-primary-container) !important;
+    }
+}
+
+.expandable-container {
+    overflow: hidden;
+    height: 0;
+    transition: height 100ms ease-in-out;
+
+    &.expanded {
+        height: 100%;
+    }
+
+    .expandable-content.expanded {
+        margin-top: 0;
+        opacity: 1;
+        height: auto;
+    }
+
+    .expandable-content {
+        margin-top: -200%;
+        opacity: 0;
+        transition: margin-top 200ms ease-in-out, opacity 300ms linear;
+    }
+}

@@ -12,23 +12,23 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 export interface IFile {
-  path: string,
-  name: string,
-  size: number,
-  folder: boolean,
-  kind: string,
-  cdn_url?: string,
+    path: string,
+    name: string,
+    size: number,
+    folder: boolean,
+    cdn_url?: string,
 }
 
 export enum PresentationStyle {
-  list = 1,
-  grid = 0,
+    list = 1,
+    grid = 0,
 }
 
 export interface ISortType {
-  field: string,
-  reverse: boolean,
+    field: string,
+    reverse: boolean,
 }
 

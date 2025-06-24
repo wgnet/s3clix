@@ -12,17 +12,19 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
-import { Pipe, PipeTransform } from '@angular/core';
+**/
+
+import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
-  name: 'encodeURI',
-  pure: true
+    name: 'encodeURI',
+    pure: true,
+    standalone: false
 })
 export class EncodeURIPipe implements PipeTransform {
 
-  transform(value:string): string {
-    return encodeURIComponent(value);
-  }
+    transform(value: string): string {
+        return encodeURIComponent(value);
+    }
 
 }

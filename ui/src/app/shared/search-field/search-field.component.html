@@ -1,43 +1,49 @@
-<div *ngIf="searchFormControl.value" class="wrapper" (click)="closeSearchPanel()"></div>
+@if (searchFormControl.value) {
+    <div class="wrapper" (click)="closeSearchPanel()"></div>
+}
 <form>
-  <input [formControl]="searchFormControl" type="text" placeholder="Search..."
-         [class.input_focus]="fileListSignal().length || searchFormControl.value">
-  <mat-icon class="custom-mat-icon">search</mat-icon>
+    <input [formControl]="searchFormControl" type="text" placeholder="Search..."
+           [class.input_focus]="fileListSignal().length || searchFormControl.value"
+           [class.py-2]="searchFormControl.value">
+    <mat-icon class="custom-mat-icon">search</mat-icon>
 </form>
-<div *ngIf="searchFormControl.value" class="position-absolute custom-content-text">
-  <ng-container *ngIf="fileListSignal().length; else noFileList">
-    <div *ngFor="let file of fileListSignal()" midiGlassHover
-         class="d-flex flex-column px-3 py-2 border-bottom cursor-pointer"
-         (click)="openFile(file)">
-      <div class="d-flex align-items-start">
-        <div class="flex-shrink-0 d-none d-sm-flex align-items-center me-1 search__result-icon"><i
-          class="icon-size bi bi-file-earmark me-1 bi-filetype-{{file.name | extensionExtractor}}"
-          [class.bi-folder]="file.folder"
-        ></i></div>
-        <div class="flex-grow-1 search__result-info">
-          <div class="search__result-filename">{{file.name | trimEndSlash }}</div>
-          <div class="fs-8 custom-small-text">path: {{file.path}}</div>
-        </div>
-      </div>
+@if (searchFormControl.value) {
+    <div class="position-absolute custom-content-text">
+        @if (fileListSignal().length) {
+            @for (file of fileListSignal(); track file.name) {
+                <div glassHover
+                     class="d-flex flex-column px-3 py-2 border-bottom_style cursor-pointer"
+                     (click)="openFile(file)">
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0 d-none d-sm-flex align-items-center me-1 search__result-icon"><i
+                            class="icon-size bi bi-file-earmark me-1 bi-filetype-{{file.name | extensionExtractor}}"
+                            [class.bi-folder]="file.folder"
+                        ></i></div>
+                        <div class="flex-grow-1 search__result-info">
+                            <div class="search__result-filename">{{ file.name | trimEndSlash }}</div>
+                            <div class="fs-8 custom-small-text">path: {{ file.path }}</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        } @else {
+            @if (!dataLoading) {
+                @if ((searchFormControl.valid)) {
+                    <div class="px-3 py-2">
+                        Oh, I can't find anything... Try another search term.
+                    </div>
+                } @else {
+                    <div class="px-3 py-2">Add one more character and I'll try to find something for you... <br>
+                        <strong>Min length: {{ minSearchTermLength }}</strong></div>
+                }
+            } @else {
+                <div class="px-3 py-2">
+                    Loading
+                    <span class="loading-animation">.</span>
+                    <span class="loading-animation">.</span>
+                    <span class="loading-animation">.</span>
+                </div>
+            }
+        }
     </div>
-  </ng-container>
-  <ng-template #noFileList>
-    <ng-container *ngIf="!dataLoading; else searchingFilesAnimation">
-      <div *ngIf="(searchFormControl.valid); else searchFormControlNotValid" class="px-3 py-2">
-        Oh, I can't find anything... Try another search term.
-      </div>
-      <ng-template #searchFormControlNotValid>
-        <div class="px-3 py-2">Add one more character and I'll try to find something for you... <br>
-          <strong>Min length: {{minSearchTermLength}}</strong></div>
-      </ng-template>
-    </ng-container>
-    <ng-template #searchingFilesAnimation>
-      <div class="px-3 py-2">
-        Loading
-        <span class="loading-animation">.</span>
-        <span class="loading-animation">.</span>
-        <span class="loading-animation">.</span>
-      </div>
-    </ng-template>
-  </ng-template>
-</div>
+}

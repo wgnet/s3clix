@@ -1,0 +1,20 @@
+:host {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    align-items: stretch;
+}
+
+.main-section {
+    flex: 30 1 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    align-items: stretch;
+
+    .main-content {
+        flex: 1;
+        overflow: hidden;
+    }
+}

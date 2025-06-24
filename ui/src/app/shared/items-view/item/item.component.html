@@ -1,50 +1,59 @@
-<div [hidden]="!viewComponent.currentPresentationStyle" midiGlassHover class="border-bottom row align-items-center text-center">
-  <div class="col-6 text-start d-flex pt-2 pb-2" role="button">
-    <i class="bi bi-file-earmark fs-4 me-2 bi-filetype-{{data.name | extensionExtractor}}"
-       [class.bi-folder]="data.folder"
-    ></i>
-    {{data.name | trimEndSlash }}
-  </div>
-  <div class="col-3 pt-2 pb-2">{{data.size != 0 ? (data.size | bytesToSize) : '--'}}</div>
-  <div class="col-2 pt-2 pb-2">{{data.folder ? 'Folder' : (data.name | extensionExtractor)}}</div>
-  <div class="col-1">
-    <button (click)="$event.stopPropagation()" mat-icon-button [matMenuTriggerFor]="menu">
-      <mat-icon>more_vert</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu">
-      <button *ngIf="!data.folder" mat-menu-item (click)="notifyParentOnFileAction(data, fileAction.download)">
-        <mat-icon>file_download</mat-icon>
-        <span>Download</span>
-      </button>
-      <button *ngIf="!data.folder" mat-menu-item (click)="notifyParentOnFileAction(data, fileAction.copyLink)">
-        <mat-icon>link</mat-icon>
-        <span>Copy Link</span>
-      </button>
-      <button *ngIf="!!data.cdn_url && !data.folder" mat-menu-item (click)="notifyParentOnFileAction(data, fileAction.copyCdnLink)">
-        <mat-icon>link</mat-icon>
-        <span>Copy CDN Link</span>
-      </button>
-      <button *ngIf="!data.folder" mat-menu-item [disabled]="disableFileDelete" (click)="notifyParentOnFileAction(data, fileAction.delete)">
-        <mat-icon>delete</mat-icon>
-        <span>Delete</span>
-      </button>
-      <button *ngIf="data.folder" mat-menu-item [disabled]="disableFileDelete" (click)="notifyParentOnFileAction(data, fileAction.deleteFolder)">
-        <mat-icon color="warn">delete</mat-icon>
-        <span>Delete folder and files</span>
-      </button>
-    </mat-menu>
-  </div>
+<div [hidden]="!viewComponent.currentPresentationStyle()" glassHover
+     class="row mx-0 border-bottom_style align-items-center text-center">
+    <div class="col-6 text-start d-flex py-2" role="button">
+        <i class="bi bi-file-earmark fs-4 me-3 bi-filetype-{{data.name | extensionExtractor}}"
+           [class.bi-folder]="data.folder"
+        ></i>
+        {{ data.name | trimEndSlash }}
+    </div>
+    <div class="col-3 py-2">{{ data.size != 0 ? (data.size | bytesToSize) : '--' }}</div>
+    <div class="col-2 py-2">{{ data.folder ? 'Folder' : (data.name | extensionExtractor) }}</div>
+    <div class="col-1">
+        <button class="my-1" (click)="$event.stopPropagation()" mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+            @if (!data.folder) {
+                <button mat-menu-item (click)="notifyParentOnFileAction(data, fileAction.download)">
+                    <mat-icon>file_download</mat-icon>
+                    <span>Download</span>
+                </button>
+                <button mat-menu-item (click)="notifyParentOnFileAction(data, fileAction.copyLink)">
+                    <mat-icon>link</mat-icon>
+                    <span>Copy Link</span>
+                </button>
+                @if (!!data.cdn_url) {
+                    <button mat-menu-item
+                            (click)="notifyParentOnFileAction(data, fileAction.copyCdnLink)">
+                        <mat-icon>link</mat-icon>
+                        <span>Copy CDN Link</span>
+                    </button>
+                }
+                <button mat-menu-item [disabled]="disableFileDelete"
+                        (click)="notifyParentOnFileAction(data, fileAction.delete)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+                </button>
+            } @else {
+                <button mat-menu-item [disabled]="disableFileDelete"
+                        (click)="notifyParentOnFileAction(data, fileAction.deleteFolder)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete folder and files</span>
+                </button>
+            }
+        </mat-menu>
+    </div>
 </div>
 
-<div [hidden]="viewComponent.currentPresentationStyle" class="item__grid-view text-center">
-  <div class="m-3" role="button">
-    <i class="bi bi-file-earmark fs-1 bi-filetype-{{data.name | extensionExtractor}}"
-       [class.bi-folder]="data.folder"
-    ></i>
-    <div class="mb-1 mt-2 text-break item__grid-view__title"
-         title="{{data.name | trimEndSlash}}">{{data.name | trimEndSlash | shortenLongText}}</div>
-    <div class="fw-lighter item__grid-view__subtitle">{{data.size != 0 ? (data.size | bytesToSize) : ''}}</div>
-  </div>
+<div [hidden]="viewComponent.currentPresentationStyle()" class="item__grid-view text-center">
+    <div class="m-3" role="button">
+        <i class="bi bi-file-earmark fs-1 bi-filetype-{{data.name | extensionExtractor}}"
+           [class.bi-folder]="data.folder"></i>
+        <div class="mb-1 mt-2 text-break item__grid-view__title"
+             title="{{data.name | trimEndSlash}}">{{ data.name | trimEndSlash | shortenLongText }}
+        </div>
+        <div class="fw-lighter item__grid-view__subtitle">{{ data.size != 0 ? (data.size | bytesToSize) : '' }}</div>
+    </div>
 </div>
 
 

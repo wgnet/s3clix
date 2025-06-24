@@ -1,0 +1,4 @@
+<app-loader [isLoading]="isLoading()"></app-loader>
+<div class="overflow-auto position-relative h-100 d-flex">
+    <ngx-codemirror class="w-100" [ngModel]="content()" [options]="readonlyOptions()"></ngx-codemirror>
+</div>

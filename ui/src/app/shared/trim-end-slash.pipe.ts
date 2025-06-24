@@ -12,21 +12,23 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
     name: 'trimEndSlash',
-    pure: true
+    pure: true,
+    standalone: false
 })
 
 export class TrimEndSlashPipe implements PipeTransform {
 
     transform(value: string): string {
         if (value && value.endsWith('/'))
-            return value.slice(0, -1)
+            return value.slice(0, -1);
         else
-            return value
+            return value;
     }
 
 }

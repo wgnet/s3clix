@@ -12,16 +12,17 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 export enum FileAction {
-  download = 0,
-  delete = 1,
-  copyLink = 2,
-  copyCdnLink = 3,
-  deleteFolder = 4,
+    download = 0,
+    delete = 1,
+    copyLink = 2,
+    copyCdnLink = 3,
+    deleteFolder = 4,
 }
 
 export interface IFileListQueryParams {
-  file?: string,
-  bucket?: string;
+    file?: string,
+    bucket?: string | null;
 }

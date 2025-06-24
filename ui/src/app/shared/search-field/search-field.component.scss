@@ -1,100 +1,112 @@
 .wrapper {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
 }
 
 form {
-  position: relative;
-  display: inline-block;
+    position: relative;
+    display: inline-block;
+    height: 36px;
+    align-content: center;
 
 }
 
 input {
-  position: relative;
-  cursor: pointer;
-  outline: none;
-  border: none;
-  border-radius: 30px;
-  padding: 0.2rem 1rem;
-  width: 0;
-  background-color: inherit;
-  z-index: 100;
-  transition: width .5s;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    border-radius: 30px;
+    padding: 0.2rem 1rem;
+    width: 0;
+    background-color: inherit;
+    z-index: 100;
+    transition: width .5s;
 }
 
 .custom-mat-icon {
-  position: absolute !important;
-  right: 0;
-  top: 10%;
-  font-size: 1.25rem;
-  z-index: 1;
+    position: absolute !important;
+    right: 0;
+    top: 21%;
+    font-size: 1.25rem;
+    z-index: 1;
 }
+
 
 input:focus, .input_focus {
-  box-shadow: inset 0 1px 5px 0 lightgrey;;
-  cursor: text;
-  background-color: white;
-  width: 25vw;
-  z-index: 1;
+    cursor: text;
+    background-color: var(--custom-container-background-color);
+    width: 25vw;
+    z-index: 1;
 }
 
+input:focus {
+    box-shadow: inset 0 1px 5px 0 var(--mat-sys-surface-container-highest);
+}
+
+.input_focus {
+    border-radius: 10px 10px 0 0;
+    box-shadow: 3px 3px 10px var(--mat-sys-surface-container-highest) !important;
+}
+
+
 .custom-content-text {
-  cursor: default;
-  width: 25vw;
-  min-width: 200px;
-  max-height: 60vh;
-  background-color: white;
-  border-radius: 10px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-shadow: 4px 4px 10px lightgrey;
-  z-index: 2;
+    cursor: default;
+    width: 25vw;
+    min-width: 200px;
+    max-height: 60vh;
+    background-color: var(--custom-container-background-color);
+    border-radius: 0 0 10px 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 3px 3px 10px var(--mat-sys-surface-container-highest);
+    z-index: 2;
 }
 
 @for $i from 1 through 4 {
-  .loading-animation:nth-child(#{$i}) {
-    animation: loading 1s infinite;
-    animation-delay: #{$i*100}ms;
-  }
+    .loading-animation:nth-child(#{$i}) {
+        animation: loading 1s infinite;
+        animation-delay: #{$i*100}ms;
+    }
 }
 
 @keyframes loading {
-  0% {
-    opacity: 0;
-  }
+    0% {
+        opacity: 0;
+    }
 
-  100% {
-    opacity: 1;
-  }
+    100% {
+        opacity: 1;
+    }
 }
 
 .icon-size {
-  font-size: 1.8rem
+    font-size: 1.8rem
 }
 
 .custom-small-text {
-  color: #00000091;
-  font-size: 12px
+    opacity: 0.6;
+    font-size: 12px
 }
 
 .search__result-icon {
-  margin-top: 8px;
+    margin-top: 8px;
 }
 
 .search__result-info {
-  word-wrap: break-word;
-  width: calc(100% - 1rem);
-  padding-right: 16px;
+    word-wrap: break-word;
+    width: calc(100% - 1rem);
+    padding-right: 16px;
 }
 
 .search__result-filename {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

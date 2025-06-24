@@ -12,24 +12,25 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {HomeComponent} from "./home.component";
 
 const routes: Routes = [
-  {
-    path: '**',
-    component: HomeComponent,
-    data: {
-      title: 'Home'
+    {
+        path: '**',
+        component: HomeComponent,
+        data: {
+            title: 'Home'
+        }
     }
-  },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule]
 })
 export class HomeRoutingModule {
 }

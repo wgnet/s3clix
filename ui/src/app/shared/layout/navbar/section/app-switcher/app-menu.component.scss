@@ -1,0 +1,109 @@
+.menu-container {
+    top: -8px;
+    backdrop-filter: blur(3px);
+    animation: appear-from-nowhere 0.5s linear;
+    color: var(---mat-sys-on-primary-container);
+    background-color: var(--custom-primary-background);
+    border-radius: var(--custom-border-radius);
+}
+
+.panels-container {
+    max-height: calc(100vh - 1rem);
+}
+
+.category-list {
+    max-height: 100%;
+    overflow-y: auto;
+
+
+    .category-container {
+        &__header {
+            color: darkorange;
+            font-weight: bolder !important;
+            text-shadow: 0 5px 5px color-mix(in srgb, var(--mat-sys-on-primary-container) 10%, transparent);
+        }
+
+        &__link {
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+                font-weight: bolder;
+            }
+        }
+
+        &__text {
+            color: var(--mat-sys-primary);
+        }
+    }
+}
+
+
+.instance-container {
+    max-height: 100%;
+    animation: width-300px 300ms forwards;
+    justify-content: stretch;
+    border-left: 1px solid var(--custom-menu-item-active-background);
+
+    &__header {
+        max-height: 50px;
+    }
+
+    &__header, &__description {
+        flex: 1;
+    }
+
+    &__links {
+        overflow-y: auto;
+        flex: 10;
+
+        a {
+            color: var(--mat-sys-on-primary-container);
+        }
+    }
+}
+
+.search-results-container {
+    a {
+        color: var(--mat-sys-on-primary-container);
+        text-decoration: none;
+    }
+
+    .info-container {
+        &__category {
+            color: darkorange;
+            font-weight: bold;
+        }
+    }
+
+}
+
+@keyframes width-300px {
+    from {
+        width: 0;
+    }
+    to {
+        width: 300px;
+    }
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--custom-primary-background);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--custom-menu-item-hover-background);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--custom-menu-item-active-background);
+}
+

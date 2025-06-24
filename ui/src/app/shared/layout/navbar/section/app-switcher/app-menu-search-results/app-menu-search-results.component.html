@@ -1,0 +1,27 @@
+<div class="panels-container d-flex flex-column">
+    <div class="p-2 flex-grow-0">
+        <input matInput class="w-100 search-input" placeholder="Search" [formControl]="searchFormControl">
+    </div>
+    @if (searching | async) {
+        <div class="flex-grow-1 overflow-y-auto">
+            <div class="category-list search-results-container">
+                @for (result of searchResults(); track i; let i = $index) {
+                    <a glassHover
+                       [class.active]="selectedIndex === i"
+                       role="button"
+                       [href]="result.instanceURL"
+                       class="px-3 py-2 d-block">
+                        <h4 class="m-0">{{ result.instanceName }}</h4>
+                        <small
+                            class="info-container__category">{{ result.categoryName }}</small>><small>{{ result.serviceName }}</small>
+                    </a>
+                }
+                @if (!searchResults().length) {
+                    <div class="p-3">
+                        There are nothing to show
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

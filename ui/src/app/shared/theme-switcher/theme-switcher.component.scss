@@ -1,0 +1,32 @@
+.theme-icon {
+    transition: transform 0.3s ease, rotate 0.3s ease;
+
+    &.moon-to-sun {
+        transform: rotate(180deg);
+    }
+
+    &.system-to-moon {
+        transform: rotate(360deg);
+    }
+}
+
+.slow-reveal-toggle {
+    animation: revealClip 0.3s ease-out 0.1s forwards;
+    clip-path: inset(0 100% 0 0);
+}
+
+
+@keyframes revealClip {
+    0% {
+        clip-path: inset(0 100% 0 0);
+        opacity: 0;
+    }
+    50% {
+        clip-path: inset(0 50% 0 0);
+        opacity: 0.5;
+    }
+    100% {
+        clip-path: inset(0 0 0 0);
+        opacity: 1;
+    }
+}

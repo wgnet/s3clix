@@ -1,0 +1,59 @@
+.panels-container {
+    max-height: calc(100vh - 1rem);
+}
+
+.search-input {
+    border-radius: var(--custom-border-radius);
+    padding: 0.5rem 1rem;
+    background-color: var(--mat-sys-surface-container-low);
+    border: 1px solid var(--mat-sys-surface-container-low);
+    outline: none;
+    transition: background-color 100ms linear;
+
+    &:focus {
+        background-color: var(--mat-sys-surface-container-lowest);
+        border: 1px solid var(--mat-sys-outline);
+    }
+
+    &::placeholder {
+        color: var(--mat-sys-on-surface);
+    }
+}
+
+.search-results-container {
+    a {
+        color: var(--mat-sys-on-surface);
+        text-decoration: none;
+
+        &.active {
+            background-color: rgba(245, 245, 245, 0.3);
+        }
+    }
+
+    .info-container {
+        &__category {
+            color: darkorange;
+            font-weight: bold;
+        }
+    }
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--custom-primary-background);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--custom-menu-item-hover-background);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--custom-menu-item-active-background);
+}

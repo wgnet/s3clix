@@ -12,17 +12,19 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- **/
+**/
+
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-unsupported-format',
-  templateUrl: './unsupported-format.component.html',
-  styleUrls: ['./unsupported-format.component.scss']
+    selector: 'app-unsupported-format',
+    templateUrl: './unsupported-format.component.html',
+    styleUrls: ['./unsupported-format.component.scss'],
+    standalone: false
 })
 export class UnsupportedFormatComponent {
-  @Input()
-  fileName!: string
+    @Input()
+    fileName!: string;
 
 
 }

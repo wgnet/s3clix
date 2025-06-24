@@ -1,12 +1,9 @@
-.dialog-wrapper {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.form-control {
+    color: var(--mat-sys-on-surface-variant);
+    background-color: inherit;
 }
 
-.form-control:focus{
-  border-color: lightgrey;
-  box-shadow: none;
+.form-control:focus {
+    border-color: lightgrey;
+    box-shadow: none;
 }

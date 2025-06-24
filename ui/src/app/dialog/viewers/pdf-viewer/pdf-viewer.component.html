@@ -1,0 +1,7 @@
+<app-loader [isLoading]="isLoading()"></app-loader>
+<ngx-extended-pdf-viewer
+    [src]="src"
+    [height]="'100%'"
+    [textLayer]="true"
+    [showHandToolButton]="true"
+    (pdfLoaded)="onLoad()"></ngx-extended-pdf-viewer>
