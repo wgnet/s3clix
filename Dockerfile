@@ -1,7 +1,6 @@
-FROM rust:1-alpine3.20 as rust-builder
-RUN apk update && apk upgrade && \
- apk add --no-cache gcc musl-dev perl automake make curl protoc pkgconfig openssl-dev openssl  && \
- rm -rf /var/cache/apk/*
+FROM rust:slim-bullseye AS rust-builder
+RUN apt -y update && apt -y upgrade
+RUN apt -y install libssl-dev pkg-config perl
 RUN mkdir /src
 ADD /Cargo.lock /Cargo.toml /src/
 COPY /src/ /src/src
@@ -9,11 +8,8 @@ WORKDIR /src
 RUN cargo build --release
 
 
-FROM node:20-alpine3.20 as js-builder
-
-RUN apk update && apk upgrade && \
- apk add --no-cache git  && \
- rm -rf /var/cache/apk/* \
+FROM node:20.19-bullseye-slim AS js-builder
+RUN apt -y update && apt -y upgrade
 
 RUN mkdir /src
 WORKDIR /src
@@ -24,13 +20,11 @@ RUN  mkdir -p /build && \
  npm install &&  \
  ng build --output-path /build
 
-FROM alpine:3.20
-RUN apk add --no-cache perl openssl ca-certificates curl
-COPY --from=js-builder /build /web
+FROM debian:bullseye-slim
+RUN apt -y update && apt -y upgrade
+COPY --from=js-builder /build/browser /web
 COPY --from=rust-builder /src/target/release/s3clix /usr/local/bin
-COPY /entry.sh /entry.sh
 COPY /s3clix.yaml /etc/s3clix.yaml
-RUN chmod 755 /entry.sh
 RUN chmod 644 /etc/s3clix.yaml
 USER 1000
 ENV RUST_LOG="info,s3clix=debug"
