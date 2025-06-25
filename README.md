@@ -90,7 +90,7 @@ s3:
       alias: first # user-defined alias
       access_key: "******"
       secret_key: "******"
-      url: https://***** # s3 server url
+      url: eu-central-1 # specify region for AWS
       style: Path # S3 access style, optional, Path is default
     - bucket: second
       alias: second-bucket
@@ -101,7 +101,7 @@ s3:
       guess_mime: true # optional, default false. Sets mime/type based on file extension, otherwise application/octet-stream
       sso_group_prefix: second_ # optional. If set, for this bucket groups will be prefixed for this prefix for access control
       style: Subdomain # S3 access style optional
-      url: https://*****
+      url: https://***** # specify exact URL if necessary
 ```
 
 ### Contribution

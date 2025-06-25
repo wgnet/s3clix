@@ -14,13 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 **/
 use std::io::ErrorKind;
+use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
 
 use aho_corasick::AhoCorasickBuilder;
 use anyhow::anyhow;
+use axum::body::Bytes;
 use axum::extract::BodyStream;
-use futures_util::{StreamExt, TryStreamExt};
+use futures_util::{Stream, StreamExt, TryStreamExt};
 use log::{debug, info};
 use mime_guess::mime;
 use s3::creds::Credentials;
@@ -93,10 +95,7 @@ impl S3Client {
         s3_config: &S3Config,
         bucket_config: Arc<S3Bucket>,
     ) -> anyhow::Result<Self> {
-        let region = Region::Custom {
-            region: "custom".to_owned(),
-            endpoint: bucket_config.url.clone(),
-        };
+        let region = Region::from_str(&bucket_config.url)?; // error shall never occur here, but...
         let creds = Credentials::new(
             Some(&bucket_config.access_key),
             Some(&bucket_config.secret_key),
@@ -339,7 +338,7 @@ impl S3Client {
             self.config.timeout,
             self.bucket.presign_get(path, 86400, None)
         )?;
-        let mut s = reqwest::get(url).await?.bytes_stream();
+        let mut s = get_bytes_stream(url).await?;
         while let Some(s) = StreamExt::next(&mut s).await {
             match s {
                 Ok(b) => {
@@ -423,4 +422,14 @@ fn strip_prefix(data: &str) -> String {
         Some(idx) => data[idx + 1..data.len()].to_owned(),
         None => data.to_owned(),
     }
+}
+
+#[inline(always)]
+async fn get_bytes_stream(
+    url: String,
+) -> anyhow::Result<impl Stream<Item = Result<Bytes, reqwest::Error>>> {
+    let client = reqwest::ClientBuilder::new()
+        .danger_accept_invalid_certs(true)
+        .build()?;
+    Ok(client.get(url).send().await?.bytes_stream())
 }

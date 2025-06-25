@@ -159,7 +159,14 @@ async fn redirect(
                         cookie.set_path("/");
                         cookie.set_secure(true);
                         cookie.set_http_only(true);
-                        (jar.add(cookie), Redirect::to("/")).into_response()
+                        let (jar, redirect) = match jar.get(RETURN_COOKIE) {
+                            None => (jar, Redirect::to("/")),
+                            Some(cookie) => {
+                                let value = Redirect::to(cookie.value());
+                                (jar.remove(Cookie::named(RETURN_COOKIE)), value)
+                            }
+                        };
+                        (jar.add(cookie), redirect).into_response()
                     }
                 },
                 Err(e) => {
@@ -474,6 +481,9 @@ async fn can_upload<B>(
         (StatusCode::FORBIDDEN, "403 access denied").into_response()
     }
 }
+
+const RETURN_COOKIE: &'static str = "return_to";
+
 async fn auth_middleware<B>(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
@@ -513,7 +523,10 @@ async fn auth_middleware<B>(
                     )
                         .into_response();
                 }
-                return (CookieJar::new(), Redirect::to(url.unwrap().as_str())).into_response();
+                let current = req.uri().to_string();
+                // Save current URL first to return there later
+                let jar = CookieJar::new().add(Cookie::new(RETURN_COOKIE, current));
+                return (jar, Redirect::to(url.unwrap().as_str())).into_response();
             }
         }
     }
